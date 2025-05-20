@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>RPG Game</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimum-scale=1, width=device-width, height=device-height">
+</head>
+<body>
+    <div id="rpg"></div>
+    
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevent scrolling in the game */
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e1e2f 0%, #2a2a3f 100%); /* Match the background of Game.vue */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #rpg {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 800px; /* Match the max-width in Game.vue */
+            max-height: 600px; /* Match the height in Game.vue */
+            aspect-ratio: 4 / 3; /* Maintain a 4:3 aspect ratio */
+        }
+
+        @media (max-width: 768px) {
+            #rpg {
+                max-width: 600px; /* Match the max-width in Game.vue for mobile */
+                max-height: 450px; /* Match the height in Game.vue for mobile */
+            }
+        }
+
+        @media (max-width: 480px) {
+            #rpg {
+                max-width: 100%; /* Full width on very small screens */
+                max-height: 100%; /* Full height on very small screens */
+            }
+        }
+        #game-content {
+  width: 90%;
+  max-width: 800px;
+  height: 600px; /* Fixed height instead of calc */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  #game-content {
+    max-width: 600px;
+    height: 450px; /* Fixed height for mobile */
+  }
+}
+    </style>
+</body>
+</html>

@@ -1,0 +1,15 @@
+name = 'Valtheris'
+
+modules = [
+    './main',
+    '@rpgjs/default-gui',
+    '@rpgjs/gamepad',
+   '@rpgjs/save',
+    '@rpgjs/title-screen'
+    
+    ]
+
+[start]
+    map = 'casa'
+    graphic = 'hero'
+    hitbox = [16, 16]
