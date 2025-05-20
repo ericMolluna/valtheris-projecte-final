@@ -1,6 +1,5 @@
 <template>
   <div class="video-details-container">
-    <!-- Barra de navegación superior -->
     <nav class="nav-container">
       <div class="logo">
         <router-link to="/" class="logo-link">🎮 Valtheris</router-link>
@@ -25,7 +24,6 @@
       </ul>
     </nav>
 
-    <!-- Contenedor principal -->
     <div class="main-content">
       <div v-if="loadingVideo" class="loading-message">
         <i class="icon loading-icon">⏳</i> Cargando video...
@@ -34,21 +32,16 @@
         {{ errorMessage }}
       </div>
       <div v-else class="video-details">
-        <!-- Contenedor de video mejorado -->
         <div class="video-player-container">
           <video controls :src="video.video_url" class="video-player" @error="handleVideoError">
             Tu navegador no soporta el elemento de video.
           </video>
         </div>
 
-        <!-- Contenedor de dos columnas -->
         <div class="content-wrapper">
-          <!-- Columna izquierda: Espacio reservado (vacío) -->
           <div class="left-column"></div>
 
-          <!-- Columna derecha: Controles e información -->
           <div class="right-column">
-            <!-- Controles del propietario -->
             <div v-if="isAuthenticated && user && video && video.user_id === user.id" class="owner-controls">
               <h3>Controles del propietario</h3>
               <button @click="deleteVideo(video.id)" class="delete-btn">
@@ -66,7 +59,6 @@
               <p v-if="video.description"><strong>Descripción:</strong> {{ video.description }}</p>
             </div>
 
-            <!-- Acciones del video -->
             
           </div>
         </div>

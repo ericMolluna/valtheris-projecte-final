@@ -39,7 +39,7 @@
 
 <script>
 import axios from 'axios';
-import Swal from 'sweetalert2'; // Importar SweetAlert2
+import Swal from 'sweetalert2'; 
 import '@/assets/styles/Auth/LoginView.css';
 
 export default {
@@ -53,11 +53,9 @@ export default {
     };
   },
   async created() {
-    // Configurar Axios con base URL
     axios.defaults.baseURL = 'http://localhost:8000';
     axios.defaults.withCredentials = true;
 
-    // Obtener token CSRF
     try {
       await axios.get('/sanctum/csrf-cookie');
       console.log('Token CSRF inicializado correctamente');
@@ -66,7 +64,6 @@ export default {
       this.errorMessage = 'No se pudo conectar con el servidor.';
     }
 
-    // Cargar el script de Google Identity Services
     const script = document.createElement('script');
     script.src = 'https://accounts.google.com/gsi/client';
     script.async = true;
@@ -80,12 +77,10 @@ export default {
     };
     document.body.appendChild(script);
 
-    // Declarar la función de callback globalmente
     window.handleGoogleSignIn = this.handleGoogleSignIn;
   },
   methods: {
     async handleLogin() {
-      // Mostrar SweetAlert de carga
       Swal.fire({
         title: 'Cargando...',
         text: 'Por favor, espera mientras iniciamos sesión.',
@@ -109,18 +104,17 @@ export default {
           localStorage.setItem('auth_token', response.data.token);
           this.successMessage = 'Inicio de sesión exitoso.';
           this.errorMessage = '';
-          Swal.close(); // Cerrar SweetAlert
+          Swal.close(); 
           setTimeout(() => this.$router.push('/perfil'), 1000);
         }
       } catch (error) {
         console.error('Error en login:', error.response ? error.response.data : error.message);
         this.errorMessage = error.response?.data?.message || 'Error en inicio de sesión.';
         this.successMessage = '';
-        Swal.close(); // Cerrar SweetAlert
+        Swal.close(); 
       }
     },
     async handleGoogleSignIn(response) {
-      // Mostrar SweetAlert de carga
       Swal.fire({
         title: 'Cargando...',
         text: 'Iniciando sesión con Google, por favor espera.',
@@ -145,14 +139,14 @@ export default {
           localStorage.setItem('auth_token', serverResponse.data.token);
           this.successMessage = 'Inicio de sesión con Google exitoso.';
           this.errorMessage = '';
-          Swal.close(); // Cerrar SweetAlert
+          Swal.close(); 
           setTimeout(() => this.$router.push('/'), 1000);
         }
       } catch (error) {
         console.error('Error al iniciar sesión con Google:', error);
         this.errorMessage = 'Error al iniciar sesión con Google.';
         this.successMessage = '';
-        Swal.close(); // Cerrar SweetAlert
+        Swal.close();
       }
     },
   },

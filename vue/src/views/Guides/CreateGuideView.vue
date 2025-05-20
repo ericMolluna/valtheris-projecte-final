@@ -41,10 +41,8 @@
           </button>
         </div>
   
-        <!-- Contenido del formulario basado en la pestaña activa -->
         <div class="guide-form-content">
           <form @submit.prevent="saveGuide">
-            <!-- Pestaña: Información básica -->
             <div v-if="activeFormTab === 'basic'">
               <div class="form-group">
                 <label for="title">Introduce el título de tu guía</label>
@@ -96,7 +94,6 @@
               </div>
             </div>
   
-            <!-- Pestaña: Contenido -->
             <div v-if="activeFormTab === 'content'">
               <div class="form-group">
                 <label for="content">Contenido de la guía</label>
@@ -108,7 +105,6 @@
               </div>
             </div>
   
-            <!-- Pestaña: Previsualizar -->
             <div v-if="activeFormTab === 'preview'">
               <h3>Vista previa de la guía</h3>
               <div class="preview-section">
@@ -123,7 +119,6 @@
               </div>
             </div>
   
-            <!-- Botones de acción -->
             <div class="form-actions">
               <button type="submit">
                 {{ editingGuide ? 'Actualizar Guía' : 'Crear Guía' }}
@@ -136,7 +131,6 @@
         </div>
       </div>
   
-      <!-- Footer -->
     
     </div>
   </template>

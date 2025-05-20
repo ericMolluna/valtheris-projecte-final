@@ -271,7 +271,7 @@
             </div>
           </div>
 
-          <!-- Lista de videos o placeholder -->
+    
           <div v-if="loadingVideos" class="loading-message">
             Cargando videos...
           </div>
@@ -298,7 +298,6 @@
             </div>
           </div>
 
-          <!-- Modal para reproducir video -->
           <div v-if="selectedVideo" class="video-modal">
             <div class="modal-content">
               <button class="close-btn" @click="closeVideoModal">✖</button>
@@ -345,7 +344,6 @@
       </div>
     </div>
 
-    <!-- Modal para mostrar la captura en tamaño completo con comentarios -->
     <div v-if="selectedScreenshot" class="screenshot-modal">
       <div class="modal-content">
         <button class="close-btn" @click="closeScreenshotModal">✖</button>
@@ -583,7 +581,7 @@ export default {
         axios.defaults.withCredentials = true;
         await axios.get('sanctum/csrf-cookie');
         const response = await axios.get(`/api/guides/all?sort=${this.sortByGuides}`);
-        console.log('Raw API response for guides:', response.data); // Log raw data
+        console.log('Raw API response for guides:', response.data); 
         this.guides = response.data.map(guide => ({
           ...guide,
           type: 'guide',
@@ -828,7 +826,7 @@ export default {
         return;
       }
 
-      const maxSize = 10 * 1024 * 1024; // 10MB limit
+      const maxSize = 10 * 1024 * 1024; 
       if (this.newVideo.video.size > maxSize) {
         this.videoUploadError = 'El video excede el tamaño máximo de 10MB.';
         await Swal.fire({

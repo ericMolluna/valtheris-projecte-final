@@ -21,31 +21,24 @@
       </ul>
     </nav>
 
-    <!-- Contenedor principal -->
     <div class="main-content">
-      <!-- Estado de carga -->
       <div v-if="loading" class="loading-message">
         <i class="icon loading-icon">⏳</i> Cargando captura...
       </div>
-      <!-- Estado de error -->
       <div v-else-if="error" class="error-message">
         <p>{{ error }}</p>
         <router-link to="/comunidad/capturas">Volver a las capturas</router-link>
       </div>
-      <!-- Contenido cuando los datos están cargados -->
       <div v-else-if="screenshot">
-        <!-- Contenedor de imagen mejorado -->
         <div class="screenshot-image-container">
           <img v-if="screenshot.image_url" :src="screenshot.image_url" alt="Captura del juego" class="screenshot-image"
             @error="handleImageError" />
           <div v-else class="no-image-placeholder"></div>
         </div>
 
-        <!-- Contenedor de dos columnas -->
         <div class="content-wrapper">
-          <!-- Columna izquierda: Comentarios -->
           <div class="left-column">
-            <!-- Sección de comentarios -->
+    
             <div class="comments-section">
               <h3 class="comments-title">Comentarios ({{ comments.length }})</h3>
               <div v-if="loadingComments" class="loading-message">
@@ -73,7 +66,6 @@
                 </div>
               </div>
 
-              <!-- Formulario para añadir comentario -->
               <div v-if="isAuthenticated" class="comment-form">
                 <div class="comment-form-header">
                   <span class="comment-avatar">{{ user?.name ? user.name.charAt(0) : 'A' }}</span>
@@ -91,9 +83,7 @@
             </div>
           </div>
 
-          <!-- Columna derecha: Controles e información -->
           <div class="right-column">
-            <!-- Controles del propietario -->
             <div v-if="isAuthenticated && user && screenshot.user_id === user.id" class="owner-controls">
               <h3>Controles del propietario</h3>
               <button @click="deleteScreenshot(screenshot.id)" class="delete-btn">
@@ -101,7 +91,6 @@
               </button>
             </div>
 
-            <!-- Información de la captura -->
             <div class="screenshot-info">
               <h3>Información de la captura</h3>
               <p><strong>Título:</strong> {{ screenshot.title || 'Sin título' }}</p>
@@ -112,7 +101,7 @@
           </div>
         </div>
       </div>
-      <!-- Fallback si no hay captura -->
+      <!-- Fallback  no hay captura -->
       <div v-else class="error-message">
         <p>No se encontró la captura.</p>
         <router-link to="/comunidad/capturas">Volver a las capturas</router-link>

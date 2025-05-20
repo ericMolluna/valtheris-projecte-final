@@ -1,6 +1,5 @@
 <template>
   <div class="register-container">
-    <!-- Barra de navegación integrada -->
     <nav class="nav-container">
       <div class="logo">
         <router-link to="/" class="logo-link">🎮 GameHub</router-link>
@@ -11,7 +10,6 @@
       </ul>
     </nav>
 
-    <!-- Contenido del registro -->
     <div class="register-content">
       <h2 class="animated-title">Registro</h2>
       <form @submit.prevent="handleRegister" class="register-form">
