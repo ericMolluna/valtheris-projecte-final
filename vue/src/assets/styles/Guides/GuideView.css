@@ -1,0 +1,368 @@
+.guide-detail-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1e1e2f 0%, #2a2a3f 100%);
+  display: flex;
+  flex-direction: column;
+  font-family: 'Arial', sans-serif;
+  overflow-x: hidden; /* Evita el desplazamiento horizontal */
+}
+
+/* Barra de navegación */
+.nav-container {
+  width: 100%;
+  padding: 15px 20px;
+  background-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-link {
+  text-decoration: none;
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #ff6f61;
+  transition: color 0.3s;
+}
+
+.logo-link:hover {
+  color: #e63946;
+}
+
+.nav-container ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.nav-container ul li {
+  margin: 0 30px; /* Aumentamos el margen para un mejor espaciado */
+}
+
+.nav-container ul li a {
+  text-decoration: none;
+  color: #ff6f61;
+  font-size: 1.2em;
+  display: flex;
+  align-items: center;
+  transition: color 0.3s, transform 0.3s;
+}
+
+.nav-container ul li a .icon {
+  margin-right: 8px;
+}
+
+.nav-container ul li a:hover {
+  color: #e63946;
+  transform: scale(1.1);
+}
+
+.nav-container ul li a.active {
+  color: #e63946;
+  font-weight: bold;
+  transform: scale(1.05);
+}
+
+/* Estilos para el dropdown (solo para Comunidad) */
+.nav-container ul li.dropdown {
+  position: relative;
+}
+
+.nav-container ul li.dropdown .dropdown-toggle {
+  text-decoration: none;
+  color: #ff6f61;
+  font-size: 1.2em;
+  display: flex;
+  align-items: center;
+  transition: color 0.3s, transform 0.3s;
+  cursor: pointer;
+}
+
+.nav-container ul li.dropdown .dropdown-toggle .icon {
+  margin-right: 8px;
+}
+
+.nav-container ul li.dropdown .dropdown-toggle:hover {
+  color: #e63946;
+  transform: scale(1.1);
+}
+
+.nav-container ul li.dropdown .dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  min-width: 150px;
+  z-index: 20;
+  padding: 5px 0;
+}
+
+.nav-container ul li.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.nav-container ul li.dropdown .dropdown-menu li {
+  display: block;
+  margin: 0;
+}
+
+.nav-container ul li.dropdown .dropdown-menu li a {
+  display: block;
+  padding: 8px 15px;
+  color: #ff6f61;
+  text-decoration: none;
+  font-size: 1em;
+  transition: background 0.3s, color 0.3s;
+}
+
+.nav-container ul li.dropdown .dropdown-menu li a:hover {
+  background: #ff6f61;
+  color: white;
+}
+
+/* Contenido principal */
+.guide-content-wrapper {
+  max-width: 1200px;
+  width: 100%; /* Aseguramos que no exceda el contenedor */
+  margin: 20px auto;
+  padding: 20px;
+  background: #2a2a3f;
+  border-radius: 10px;
+  flex-grow: 1;
+  box-sizing: border-box; /* Incluye padding en el ancho */
+}
+
+.loading-message,
+.error-message {
+  text-align: center;
+  color: #ff6f61;
+  font-size: 1.2em;
+}
+
+/* Encabezado de la guía */
+.guide-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.guide-image-container {
+  width: 100px;
+  padding-top: 100px;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #1e1e2f;
+  flex-shrink: 0;
+}
+
+.guide-image-container img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 8px;
+}
+
+.no-image-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-size: 0.9em;
+  background: #1e1e2f;
+}
+
+.guide-title-container {
+  flex-grow: 1;
+  background: none;
+  padding: 0;
+  text-align: left;
+}
+
+.title-and-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.guide-title {
+  color: white;
+  font-size: 1.5em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.action-btn {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.action-btn:hover {
+  transform: scale(1.05);
+}
+
+.edit-btn {
+  background: #ff6f61; /* Color similar al de "Agregar a Favoritos" */
+}
+
+.edit-btn:hover {
+  background: #e63946;
+}
+
+.delete-btn {
+  background: #f44336; /* Color similar al de "No me gusta" */
+}
+
+.delete-btn:hover {
+  background: #da190b;
+}
+
+.guide-rating {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 5px 0;
+}
+
+.stars {
+  color: #ccc;
+  font-size: 1em;
+}
+
+.rating-text {
+  color: #ccc;
+  font-size: 0.9em;
+}
+
+.guide-author {
+  color: #ff6f61;
+  font-size: 1em;
+  margin: 5px 0 0;
+}
+
+/* Botones de acción */
+.guide-actions {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.like-btn {
+  background: #4caf50;
+}
+
+.like-btn:hover {
+  background: #45a049;
+}
+
+.dislike-btn {
+  background: #f44336;
+}
+
+.dislike-btn:hover {
+  background: #da190b;
+}
+
+.award-btn {
+  background: #ff9800;
+}
+
+.award-btn:hover {
+  background: #e68a00;
+}
+
+.favorite-btn {
+  background: #ff6f61;
+}
+
+.favorite-btn:hover {
+  background: #e63946;
+}
+
+.share-btn {
+  background: #4285f4;
+}
+
+.share-btn:hover {
+  background: #357abd;
+}
+
+/* Contenido principal y metadatos */
+.guide-main-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  width: 100%; /* Aseguramos que no exceda el contenedor */
+  box-sizing: border-box; /* Incluye padding en el ancho */
+}
+
+.guide-body {
+  background: #1e1e2f;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.guide-content-text {
+  color: white;
+  font-size: 1.1em;
+  line-height: 1.6;
+}
+
+.guide-meta {
+  background: #1e1e2f;
+  padding: 20px;
+  border-radius: 8px;
+  color: white;
+}
+
+.guide-meta h3 {
+  color: #ff6f61;
+  font-size: 1.2em;
+  margin-bottom: 15px;
+}
+
+.meta-item {
+  margin-bottom: 10px;
+}
+
+.meta-label {
+  font-weight: bold;
+  color: #ff6f61;
+}
+
+.meta-value {
+  color: white;
+}

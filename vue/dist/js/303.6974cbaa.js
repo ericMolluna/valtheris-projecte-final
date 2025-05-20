@@ -1,0 +1,2 @@
+"use strict";(self["webpackChunkvue"]=self["webpackChunkvue"]||[]).push([[303],{5303:function(n,u,e){e.r(u),e.d(u,{default:function(){return o}});var r=e(6768);function t(n,u){return(0,r.uX)(),(0,r.CE)("h1",null,"404 - Ruta no encontrada")}var a=e(1241);const c={},f=(0,a.A)(c,[["render",t]]);var o=f}}]);
+//# sourceMappingURL=303.6974cbaa.js.map
