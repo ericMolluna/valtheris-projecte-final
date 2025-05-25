@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 // Componentes y vistas
 import Game from '../components/Game.vue';
-import MenuView from '../views/MenuView.vue';
 import HomeView from '../views/HomeView.vue';
 import NotFound from '../views/NotFound.vue';
 
@@ -27,8 +26,7 @@ import EditProfileView from '../views/Profile/EditProfileView.vue';
 
 // Definición de rutas
 const routes = [
-  { path: '/', component: MenuView, name: 'Home' },
-  { path: '/home', component: HomeView, name: 'HomeView' },
+  { path: '/', component: HomeView, name: 'Home' },
   { path: '/login', component: LoginView, name: 'Login' },
   { path: '/register', component: RegisterView, name: 'Register' },
   { path: '/juego', component: Game, name: 'Juego' },
@@ -83,12 +81,6 @@ const routes = [
     name: 'Retransmissions',
     component: CommunityView,
   },
-  {
-    path: '/about',
-    name: 'About',
-    component: () => import('../views/AboutView.vue'),
-  },
- 
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
