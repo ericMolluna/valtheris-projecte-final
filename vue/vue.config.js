@@ -1,7 +1,5 @@
-const { defineConfig } = require('@vue/cli-service')
-module.exports = defineConfig({
+module.exports = {
   devServer: {
-    historyApiFallback: true, // Esto asegura que todas las rutas devuelvan index.html
+    historyApiFallback: true,
   },
-  transpileDependencies: true
-})
+};

@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "scripts": {
+    "start-all": "concurrently \"cd vue && npm run serve\" \"cd rpg && npx cross-env RPG_TYPE=rpg npm run dev\" \"cd laravel && php artisan serve\""
+  }
+}

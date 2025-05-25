@@ -1,6 +1,0 @@
-{
-    "require": {
-        "laravel/socialite": "^5.18",
-        "google/apiclient": "^2.18"
-    }
-}
