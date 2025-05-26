@@ -289,20 +289,29 @@
   margin-bottom: 20px;
 }
 
-.zone-carousel-container {
+.carousel-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
-  max-width: 400px;
-  margin: 0 auto;
+  width: 100%;
+}
+
+.zone-carousel-container {
+  width: 100%;
+  max-width: 1200px;
   overflow: hidden;
+  position: relative;
 }
 
 .zone-carousel-wrapper {
   display: flex;
-  transition: transform 0.5s ease;
+  transition: transform 0.5s ease-in-out;
 }
 
 .zone-card {
-  min-width: 100%;
+  flex: 0 0 calc(33.33% - 20px);
+  margin: 0 10px;
   background: rgba(20, 20, 20, 0.9);
   border: 4px solid #00ffcc;
   border-radius: 8px;
@@ -311,9 +320,10 @@
   flex-direction: column;
   align-items: center;
   box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+  box-sizing: border-box;
 }
 
- zone-image {
+.zone-image {
   width: 100%;
   height: 200px;
   object-fit: cover;
@@ -343,9 +353,6 @@
 }
 
 .carousel-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
   background: #ff0066;
   color: #000;
   border: 3px solid #000;
@@ -358,24 +365,20 @@
   font-size: 1.2em;
   cursor: pointer;
   transition: transform 0.2s, background 0.3s;
+  z-index: 10;
 }
 
 .carousel-arrow:hover {
   background: #ffcc00;
-  transform: translateY(-50%) scale(1.1);
-}
-
-.carousel-arrow:disabled {
-  background: #666;
-  cursor: not-allowed;
+  transform: scale(1.1);
 }
 
 .left-arrow {
-  left: -50px;
+  margin-right: 20px;
 }
 
 .right-arrow {
-  right: -50px;
+  margin-left: 20px;
 }
 
 /* Responsive Design for Hero, Roadmap, and Zone Carousel */
@@ -471,7 +474,12 @@
   }
 
   .zone-carousel-container {
-    max-width: 300px;
+    max-width: 100%;
+  }
+
+  .zone-card {
+    flex: 0 0 calc(33.33% - 20px);
+    margin: 0 10px;
   }
 
   .zone-image {
@@ -493,11 +501,11 @@
   }
 
   .left-arrow {
-    left: -40px;
+    margin-right: 10px;
   }
 
   .right-arrow {
-    right: -40px;
+    margin-left: 10px;
   }
 
   .modal-content {
@@ -562,8 +570,9 @@
     font-size: 1.4em;
   }
 
-  .zone-carousel-container {
-    max-width: 250px;
+  .zone-card {
+    flex: 0 0 calc(33.33% - 20px);
+    margin: 0 10px;
   }
 
   .zone-image {
@@ -585,11 +594,11 @@
   }
 
   .left-arrow {
-    left: -35px;
+    margin-right: 5px;
   }
 
   .right-arrow {
-    right: -35px;
+    margin-left: 5px;
   }
 
   .phase-title {
