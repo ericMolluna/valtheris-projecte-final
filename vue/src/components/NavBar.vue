@@ -1,13 +1,17 @@
 <template>
-  <div class="navbar-container">
-    <nav>
-      <ul>
-        <li v-for="(item, index) in items" :key="index">
-          <router-link :to="item.route">{{ item.label }}</router-link>
-        </li>
-      </ul>
-    </nav>
-  </div>
+  <nav class="nav-container">
+    <div class="nav-header">
+      <div class="nav-logo">Valtheris</div>
+      <button class="menu-toggle" @click="toggleMenu" aria-label="Toggle Menu">
+        ☰
+      </button>
+    </div>
+    <ul :class="{ 'nav-links': true, 'nav-links-open': isMenuOpen }">
+      <li v-for="item in items" :key="item.label">
+        <router-link :to="item.route" @click="closeMenu">{{ item.label }}</router-link>
+      </li>
+    </ul>
+  </nav>
 </template>
 
 <script>
@@ -16,35 +20,23 @@ export default {
   props: {
     items: {
       type: Array,
-      required: true,
-    },
+      required: true
+    }
   },
-};
+  data() {
+    return {
+      isMenuOpen: false
+    }
+  },
+  methods: {
+    toggleMenu() {
+      this.isMenuOpen = !this.isMenuOpen;
+    },
+    closeMenu() {
+      this.isMenuOpen = false;
+    }
+  }
+}
 </script>
 
-<style scoped>
-.navbar-container {
-  text-align: center;
-  padding: 20px;
-}
-
-nav ul {
-  list-style: none;
-  padding: 0;
-}
-
-nav ul li {
-  display: inline;
-  margin: 0 15px;
-}
-
-nav ul li a {
-  text-decoration: none;
-  color: #42b983;
-  font-size: 1.2em;
-}
-
-nav ul li a:hover {
-  color: #35495e;
-}
-</style>
+<style src="@/assets/styles/NavBar.css" scoped></style>

@@ -1,16 +1,22 @@
 <template>
   <footer class="footer-section">
     <div class="footer-content">
-      <p>© 2025 Valtheris Devs</p>
-      <div class="social-links">
-        <a href="#" class="social-icon" aria-label="Twitter">🐦</a>
-        <a href="#" class="social-icon" aria-label="Facebook">📘</a>
-        <a href="#" class="social-icon" aria-label="Twitch">🎮</a>
-      </div>
-      <div class="footer-extra">
+      <div class="footer-logo">Valtheris Devs</div>
+      <div class="footer-links">
         <p>Contacto: contacto@valtheris.com</p>
         <p>Dirección: Calle Ficticia 123, Fantasía</p>
-        <p><router-link to="/terminos">Términos y Condiciones</router-link> | <router-link to="/privacidad">Política de Privacidad</router-link></p>
+        <p>
+          <router-link to="/terminos">Términos</router-link> |
+          <router-link to="/privacidad">Privacidad</router-link>
+        </p>
+      </div>
+      <div class="social-links">
+        <a href="https://github.com/JoMaGuPa" class="social-icon" aria-label="GitHub Repo 1">
+          🐙
+        </a>
+        <a href="https://github.com/ericMolluna" class="social-icon" aria-label="GitHub Repo 2">
+          🐙
+        </a>
       </div>
     </div>
   </footer>
@@ -22,11 +28,4 @@ export default {
 }
 </script>
 
-<style scoped>
-/* Estilos para el footer */
-.footer-extra {
-  margin-top: 1rem;
-  font-size: 0.85rem;
-  color: #ccc;
-}
-</style>
+<style src="@/assets/styles/FooterSection.css" scoped></style>

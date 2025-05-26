@@ -1,0 +1,48 @@
+/* Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Main Container */
+.main-container {
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  background: url('@/assets/background-retro.png') no-repeat center center fixed;
+  background-size: cover;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Scanline Overlay for Retro Effect */
+.main-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    rgba(0, 0, 0, 0.1) 0,
+    rgba(0, 0, 0, 0.1) 2px,
+    transparent 2px,
+    transparent 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Responsive Design for Main Container */
+@media (max-width: 768px) {
+  .main-container::before {
+    background: repeating-linear-gradient(
+      rgba(0, 0, 0, 0.05) 0,
+      rgba(0, 0, 0, 0.05) 2px,
+      transparent 2px,
+      transparent 4px
+    );
+  }
+}
