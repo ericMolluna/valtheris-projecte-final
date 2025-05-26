@@ -1,32 +1,7 @@
 <template>
   <div class="community-container">
-    <!-- Barra de navegación superior -->
-    <nav class="nav-container">
-      <div class="logo">
-        <router-link to="/" class="logo-link">🎮 Valtheris</router-link>
-      </div>
-      <ul>
-        <li v-if="userTier === 'Tier 3'">
-          <router-link to="/juego">
-            <i class="icon">🎮</i> <span>Jugar</span>
-          </router-link>
-        </li>
-        <li v-else class="coming-soon">
-          <span><i class="icon">🎮</i> <span>Próximamente</span></span>
-        </li>
-        <li>
-          <router-link to="/comunidad">
-            <i class="icon">👥</i> <span>Comunidad</span>
-          </router-link>
-        </li>
-        <li>
-          <router-link :to="isAuthenticated ? '/perfil' : '/login'">
-            <i class="icon">{{ isAuthenticated ? '👤' : '🔑' }}</i>
-            <span>{{ isAuthenticated ? 'Perfil' : 'Login' }}</span>
-          </router-link>
-        </li>
-      </ul>
-    </nav>
+    <!-- Navbar -->
+    <NavBar :items="navItems" :isAuthenticated="isAuthenticated" :userTier="userTier" />
 
     <!-- Barra de pestañas -->
     <div class="tabs-container">
@@ -47,8 +22,6 @@
               <h2>Todo</h2>
             </div>
           </div>
-
-          <!-- Lista combinada de todo el contenido -->
           <div class="todo-section">
             <div v-if="loadingAllContent" class="loading-message">
               Cargando contenido...
@@ -62,7 +35,6 @@
             <div v-else class="content-list">
               <div class="content-card" v-for="item in allContent" :key="item.id + '-' + item.type"
                 @click="handleContentClick(item)" :title="getContentTitle(item)">
-                <!-- Renderizar según el tipo de contenido -->
                 <div v-if="item.type === 'guide'" class="guide-card">
                   <div class="guide-card-image">
                     <img v-if="item.image" :src="item.image" alt="Portada de la guía" @error="handleImageError" />
@@ -73,7 +45,6 @@
                     <p class="guide-description">{{ item.description || 'Sin descripción' }}</p>
                   </div>
                 </div>
-
                 <div v-else-if="item.type === 'screenshot'" class="screenshot-card">
                   <div class="screenshot-image">
                     <img :src="item.image_url" alt="Captura del juego" @error="handleImageError" />
@@ -82,7 +53,6 @@
                     <span>{{ item.title || 'Sin título' }}</span>
                   </div>
                 </div>
-
                 <div v-else-if="item.type === 'video'" class="video-card">
                   <div class="video-thumbnail">
                     <img :src="item.thumbnail_url || 'https://via.placeholder.com/280x150?text=Sin+miniatura'"
@@ -100,7 +70,6 @@
 
         <!-- Mostrar guías si la ruta es /comunidad/guias -->
         <div v-else-if="$route.path === '/comunidad/guias'" class="guides-content">
-          <!-- Header Section -->
           <div class="guides-header">
             <div class="header-left">
               <h2>Guías</h2>
@@ -119,8 +88,6 @@
               <i class="icon">✍️</i> Crear Nueva Guía
             </router-link>
           </div>
-
-          <!-- Lista de guías o placeholder -->
           <div v-if="loadingGuides" class="loading-message">
             Cargando guías...
           </div>
@@ -150,7 +117,6 @@
 
         <!-- Mostrar capturas si la ruta es /comunidad/capturas -->
         <div v-else-if="$route.path === '/comunidad/capturas'" class="screenshots-content">
-          <!-- Header Section -->
           <div class="screenshots-header">
             <div class="header-left">
               <h2>Capturas</h2>
@@ -169,8 +135,6 @@
               <i class="icon">📸</i> Subir Captura
             </button>
           </div>
-
-          <!-- Formulario para subir captura (modal) -->
           <div v-if="showUploadForm" class="upload-form-modal">
             <div class="upload-form">
               <h3>Subir Nueva Captura</h3>
@@ -184,7 +148,6 @@
                   <label for="screenshot-image">Seleccionar Imagen</label>
                   <input type="file" id="screenshot-image" accept="image/*" @change="handleFileChange" required />
                 </div>
-
                 <div class="form-actions">
                   <button type="submit" class="submit-btn">Subir</button>
                   <button type="button" class="cancel-btn" @click="showUploadForm = false">Cancelar</button>
@@ -193,8 +156,6 @@
               </form>
             </div>
           </div>
-
-          <!-- Lista de capturas o placeholder -->
           <div v-if="loadingScreenshots" class="loading-message">
             Cargando capturas...
           </div>
@@ -223,7 +184,6 @@
 
         <!-- Mostrar videos si la ruta es /videos -->
         <div v-else-if="$route.path === '/videos'" class="videos-content">
-          <!-- Header Section -->
           <div class="videos-header">
             <div class="header-left">
               <h2>Videos</h2>
@@ -242,8 +202,6 @@
               <i class="icon">🎥</i> Subir Video
             </button>
           </div>
-
-          <!-- Formulario para subir video (modal) -->
           <div v-if="showVideoUploadForm" class="upload-form-modal">
             <div class="upload-form">
               <h3>Subir Nuevo Video</h3>
@@ -270,8 +228,6 @@
               </form>
             </div>
           </div>
-
-    
           <div v-if="loadingVideos" class="loading-message">
             Cargando videos...
           </div>
@@ -297,7 +253,6 @@
               </div>
             </div>
           </div>
-
           <div v-if="selectedVideo" class="video-modal">
             <div class="modal-content">
               <button class="close-btn" @click="closeVideoModal">✖</button>
@@ -344,6 +299,7 @@
       </div>
     </div>
 
+    <!-- Screenshot Modal -->
     <div v-if="selectedScreenshot" class="screenshot-modal">
       <div class="modal-content">
         <button class="close-btn" @click="closeScreenshotModal">✖</button>
@@ -388,6 +344,9 @@
         </div>
       </div>
     </div>
+
+    <!-- Footer -->
+    <FooterSection />
   </div>
 </template>
 
@@ -395,9 +354,15 @@
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { isAuthenticated } from '@/api/auth';
+import NavBar from '@/components/NavBar.vue';
+import FooterSection from '@/components/FooterSection.vue';
 
 export default {
   name: 'CommunityView',
+  components: {
+    NavBar,
+    FooterSection,
+  },
   data() {
     return {
       isAuthenticated: localStorage.getItem('auth_token') !== null,
@@ -412,11 +377,7 @@ export default {
       errorMessageScreenshots: '',
       sortByScreenshots: 'recent',
       showUploadForm: false,
-      newScreenshot: {
-        title: '',
-        image: null,
-        description: '',
-      },
+      newScreenshot: { title: '', image: null, description: '' },
       uploadError: '',
       selectedScreenshot: null,
       comments: [],
@@ -426,11 +387,7 @@ export default {
       errorMessageVideos: '',
       sortByVideos: 'recent',
       showVideoUploadForm: false,
-      newVideo: {
-        title: '',
-        video: null,
-        description: '',
-      },
+      newVideo: { title: '', video: null, description: '' },
       videoUploadError: '',
       selectedVideo: null,
       videoComments: [],
@@ -444,18 +401,25 @@ export default {
         { name: 'Guías', path: '/comunidad/guias' },
         { name: 'Videos', path: '/videos' },
       ],
+      isProcessing: false,
     };
   },
   computed: {
+    navItems() {
+      const baseItems = [
+        { label: 'Inicio', route: '/', icon: '🏠' },
+        { label: 'Comunidad', route: '/comunidad', icon: '👥' },
+      ];
+      const authItem = this.isAuthenticated
+        ? { label: 'Perfil', route: '/perfil', icon: '👤' }
+        : { label: 'Login', route: '/login', icon: '🔑' };
+      return [...baseItems, authItem];
+    },
     sortedGuides() {
       if (this.sortByGuides === 'popular') {
-        const sorted = [...this.guides].sort((a, b) => (b.likes || 0) - (a.likes || 0)); // Use 'likes' if that's the field name
-        console.log('Sorted guides by popularity:', sorted);
-        return sorted;
+        return [...this.guides].sort((a, b) => (b.likes || 0) - (a.likes || 0));
       }
-      const sorted = [...this.guides].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-      console.log('Sorted guides by recent:', sorted);
-      return sorted;
+      return [...this.guides].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     },
     sortedScreenshots() {
       if (this.sortByScreenshots === 'popular') {
@@ -474,7 +438,6 @@ export default {
     window.addEventListener('storage', this.updateAuthStatus);
     this.checkAuthStatus();
     this.fetchUserData();
-
     if (this.$route.path === '/comunidad') {
       this.fetchGuides();
       this.fetchScreenshots();
@@ -489,7 +452,6 @@ export default {
   },
   watch: {
     '$route'(to) {
-      console.log('Ruta actualizada a:', to.path);
       if (to.path === '/comunidad') {
         this.fetchGuides();
         this.fetchScreenshots();
@@ -511,11 +473,48 @@ export default {
     sortByVideos() {
       this.fetchVideos();
     },
+    isAuthenticated() {
+      // Force re-render of navItems when authentication status changes
+      this.$forceUpdate();
+    },
   },
   beforeUnmount() {
     window.removeEventListener('storage', this.updateAuthStatus);
   },
   methods: {
+    async handleLogout() {
+      try {
+        axios.defaults.baseURL = 'http://localhost:8000';
+        axios.defaults.withCredentials = true;
+        await axios.get('sanctum/csrf-cookie');
+        const token = localStorage.getItem('auth_token');
+        if (token) {
+          await axios.post('/api/logout', {}, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+        }
+        localStorage.removeItem('auth_token');
+        this.isAuthenticated = false;
+        this.user = null;
+        this.userTier = 'Tier 1';
+        this.$router.push('/login');
+        await Swal.fire({
+          title: 'Sesión cerrada',
+          text: 'Has cerrado sesión exitosamente.',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } catch (error) {
+        console.error('Error en logout:', error);
+        await Swal.fire({
+          title: 'Error',
+          text: 'No se pudo cerrar la sesión.',
+          icon: 'error',
+          confirmButtonColor: '#ff6f61',
+        });
+      }
+    },
     async checkAuthStatus() {
       this.isAuthenticated = await isAuthenticated();
       if (!this.isAuthenticated) {
@@ -530,7 +529,6 @@ export default {
         this.userTier = 'Tier 1';
       }
     },
-
     async fetchAllContent() {
       this.loadingAllContent = true;
       try {
@@ -581,7 +579,6 @@ export default {
         axios.defaults.withCredentials = true;
         await axios.get('sanctum/csrf-cookie');
         const response = await axios.get(`/api/guides/all?sort=${this.sortByGuides}`);
-        console.log('Raw API response for guides:', response.data); 
         this.guides = response.data.map(guide => ({
           ...guide,
           type: 'guide',
@@ -619,7 +616,6 @@ export default {
           isLikedByUser: screenshot.user_liked || false,
           isDislikedByUser: screenshot.user_disliked || false,
         }));
-        console.log('Screenshots obtenidos:', this.screenshots);
         this.combineAllContent();
       } catch (error) {
         const errorMsg = error.response
@@ -641,7 +637,6 @@ export default {
         const response = await axios.get(`/api/videos?sort=${this.sortByVideos}`);
         this.videos = response.data.map(video => {
           const thumbnailUrl = video.thumbnail_url ? `http://localhost:8000${video.thumbnail_url}` : 'https://via.placeholder.com/280x150?text=Sin+miniatura';
-          console.log('Processing video:', video.title, 'Thumbnail URL:', thumbnailUrl);
           return {
             ...video,
             video_url: `http://localhost:8000${video.video_url}`,
@@ -649,7 +644,6 @@ export default {
             type: 'video',
           };
         });
-        console.log('Videos obtenidos:', this.videos);
         this.combineAllContent();
       } catch (error) {
         const errorMsg = error.response
@@ -717,7 +711,6 @@ export default {
         });
         return;
       }
-
       if (!this.newScreenshot.title.trim()) {
         this.uploadError = 'Por favor, proporciona un título para la captura.';
         await Swal.fire({
@@ -728,7 +721,6 @@ export default {
         });
         return;
       }
-
       const maxSize = 2048 * 1024;
       if (this.newScreenshot.image.size > maxSize) {
         this.uploadError = 'La imagen excede el tamaño máximo de 2MB.';
@@ -740,7 +732,6 @@ export default {
         });
         return;
       }
-
       if (!this.newScreenshot.image.type.startsWith('image/')) {
         this.uploadError = 'El archivo seleccionado no es una imagen válida.';
         await Swal.fire({
@@ -751,19 +742,17 @@ export default {
         });
         return;
       }
-
       const formData = new FormData();
       formData.append('title', this.newScreenshot.title);
       formData.append('image', this.newScreenshot.image);
       formData.append('description', this.newScreenshot.description || '');
-
       try {
         axios.defaults.baseURL = 'http://localhost:8000';
         axios.defaults.withCredentials = true;
         await axios.get('sanctum/csrf-cookie');
         const token = localStorage.getItem('auth_token');
         if (!token) {
-          throw new Error('No se encontró el token de autenticación. Por favor, inicia sesión nuevamente.');
+          throw new Error('No se encontró el token de autenticación.');
         }
         await axios.post('/api/screenshots', formData, {
           headers: {
@@ -787,7 +776,7 @@ export default {
         if (error.response) {
           errorMessage = error.response.data.message || `Error del servidor: ${error.response.status}`;
         } else if (error.request) {
-          errorMessage = 'No se recibió respuesta del servidor. Verifica tu conexión.';
+          errorMessage = 'No se recibió respuesta del servidor.';
         } else {
           errorMessage = error.message;
         }
@@ -814,7 +803,6 @@ export default {
         });
         return;
       }
-
       if (!this.newVideo.title.trim()) {
         this.videoUploadError = 'Por favor, proporciona un título para el video.';
         await Swal.fire({
@@ -825,8 +813,7 @@ export default {
         });
         return;
       }
-
-      const maxSize = 10 * 1024 * 1024; 
+      const maxSize = 10 * 1024 * 1024;
       if (this.newVideo.video.size > maxSize) {
         this.videoUploadError = 'El video excede el tamaño máximo de 10MB.';
         await Swal.fire({
@@ -837,7 +824,6 @@ export default {
         });
         return;
       }
-
       if (!this.newVideo.video.type.startsWith('video/')) {
         this.videoUploadError = 'El archivo seleccionado no es un video válido.';
         await Swal.fire({
@@ -848,19 +834,17 @@ export default {
         });
         return;
       }
-
       const formData = new FormData();
       formData.append('title', this.newVideo.title);
       formData.append('video', this.newVideo.video);
       formData.append('description', this.newVideo.description || '');
-
       try {
         axios.defaults.baseURL = 'http://localhost:8000';
         axios.defaults.withCredentials = true;
         await axios.get('sanctum/csrf-cookie');
         const token = localStorage.getItem('auth_token');
         if (!token) {
-          throw new Error('No se encontró el token de autenticación. Por favor, inicia sesión nuevamente.');
+          throw new Error('No se encontró el token de autenticación.');
         }
         await axios.post('/api/videos', formData, {
           headers: {
@@ -884,7 +868,7 @@ export default {
         if (error.response) {
           errorMessage = error.response.data.message || `Error del servidor: ${error.response.status}`;
         } else if (error.request) {
-          errorMessage = 'No se recibió respuesta del servidor. Verifica tu conexión.';
+          errorMessage = 'No se recibió respuesta del servidor.';
         } else {
           errorMessage = error.message;
         }
@@ -914,10 +898,8 @@ export default {
           isLikedByUser: response.data.user_liked || false,
           isDislikedByUser: response.data.user_disliked || false,
         };
-        console.log('selectedScreenshot al abrir modal:', this.selectedScreenshot);
         await this.fetchComments(screenshot.id);
       } catch (error) {
-        console.error('Error al abrir el modal:', error);
         this.errorMessageScreenshots = 'No se pudo cargar la captura.';
       }
     },
@@ -934,8 +916,6 @@ export default {
         const response = await axios.get(`/api/screenshots/${screenshotId}/comments`);
         this.comments = response.data;
       } catch (error) {
-        console.error('Error al cargar comentarios:', error);
-        this.comments = [];
         this.errorMessageScreenshots = 'No se pudieron cargar los comentarios.';
       }
     },
@@ -949,7 +929,6 @@ export default {
         });
         return;
       }
-
       try {
         axios.defaults.baseURL = 'http://localhost:8000';
         axios.defaults.withCredentials = true;
@@ -962,9 +941,7 @@ export default {
           `/api/screenshots/${this.selectedScreenshot.id}/comments`,
           { text: this.newComment },
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           }
         );
         this.newComment = '';
@@ -977,7 +954,6 @@ export default {
           showConfirmButton: false,
         });
       } catch (error) {
-        console.error('Error al enviar comentario:', error);
         this.errorMessageScreenshots = error.response?.data?.message || 'Error al enviar el comentario.';
         await Swal.fire({
           title: 'Error',
@@ -998,11 +974,8 @@ export default {
         this.$router.push('/login');
         return;
       }
-
-      // Prevenir múltiples clics mientras la solicitud está en curso
       if (this.isProcessing) return;
       this.isProcessing = true;
-
       try {
         axios.defaults.baseURL = 'http://localhost:8000';
         axios.defaults.withCredentials = true;
@@ -1011,15 +984,12 @@ export default {
         if (!token) {
           throw new Error('No se encontró el token de autenticación.');
         }
-
         const method = screenshot.isLikedByUser ? 'delete' : 'post';
         const response = await axios({
           method,
           url: `/api/screenshots/${screenshot.id}/like`,
           headers: { Authorization: `Bearer ${token}` },
         });
-
-        // Actualizar directamente selectedScreenshot con la respuesta del backend
         this.selectedScreenshot = {
           ...this.selectedScreenshot,
           likesCount: response.data.likes,
@@ -1027,13 +997,7 @@ export default {
           isLikedByUser: response.data.user_liked,
           isDislikedByUser: response.data.user_disliked,
         };
-
-        console.log('Respuesta del backend:', response.data);
-        console.log('selectedScreenshot actualizado:', this.selectedScreenshot);
-
-        // Actualizar la lista de screenshots para mantener consistencia
         await this.fetchScreenshots();
-
         await Swal.fire({
           title: screenshot.isLikedByUser ? 'Me gusta eliminado' : '¡Me gusta añadido!',
           text: screenshot.isLikedByUser ? 'Has quitado tu "Me gusta".' : 'Has dado "Me gusta" a esta captura.',
@@ -1042,7 +1006,6 @@ export default {
           showConfirmButton: false,
         });
       } catch (error) {
-        console.error('Error al dar Me gusta:', error);
         this.errorMessageScreenshots = error.response?.data?.message || 'Error al procesar tu Me gusta.';
         await Swal.fire({
           title: 'Error',
@@ -1051,10 +1014,9 @@ export default {
           confirmButtonColor: '#ff6f61',
         });
       } finally {
-        this.isProcessing = false; // Restablecer la bandera
+        this.isProcessing = false;
       }
     },
-
     async toggleDislike(screenshot) {
       if (!this.isAuthenticated) {
         await Swal.fire({
@@ -1066,10 +1028,8 @@ export default {
         this.$router.push('/login');
         return;
       }
-
       if (this.isProcessing) return;
       this.isProcessing = true;
-
       try {
         axios.defaults.baseURL = 'http://localhost:8000';
         axios.defaults.withCredentials = true;
@@ -1078,14 +1038,12 @@ export default {
         if (!token) {
           throw new Error('No se encontró el token de autenticación.');
         }
-
         const method = screenshot.isDislikedByUser ? 'delete' : 'post';
         const response = await axios({
           method,
           url: `/api/screenshots/${screenshot.id}/dislike`,
           headers: { Authorization: `Bearer ${token}` },
         });
-
         this.selectedScreenshot = {
           ...this.selectedScreenshot,
           likesCount: response.data.likes,
@@ -1093,12 +1051,7 @@ export default {
           isLikedByUser: response.data.user_liked,
           isDislikedByUser: response.data.user_disliked,
         };
-
-        console.log('Respuesta del backend:', response.data);
-        console.log('selectedScreenshot actualizado:', this.selectedScreenshot);
-
         await this.fetchScreenshots();
-
         await Swal.fire({
           title: screenshot.isDislikedByUser ? 'No me gusta eliminado' : '¡No me gusta añadido!',
           text: screenshot.isDislikedByUser ? 'Has quitado tu "No me gusta".' : 'Has dado "No me gusta" a esta captura.',
@@ -1107,7 +1060,6 @@ export default {
           showConfirmButton: false,
         });
       } catch (error) {
-        console.error('Error al dar No me gusta:', error);
         this.errorMessageScreenshots = error.response?.data?.message || 'Error al procesar tu No me gusta.';
         await Swal.fire({
           title: 'Error',
@@ -1136,8 +1088,6 @@ export default {
         const response = await axios.get(`/api/videos/${videoId}/comments`);
         this.videoComments = response.data;
       } catch (error) {
-        console.error('Error al cargar comentarios:', error);
-        this.videoComments = [];
         this.errorMessageVideos = 'No se pudieron cargar los comentarios.';
       }
     },
@@ -1151,7 +1101,6 @@ export default {
         });
         return;
       }
-
       try {
         axios.defaults.baseURL = 'http://localhost:8000';
         axios.defaults.withCredentials = true;
@@ -1164,9 +1113,7 @@ export default {
           `/api/videos/${this.selectedVideo.id}/comments`,
           { text: this.newVideoComment },
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           }
         );
         this.newVideoComment = '';
@@ -1179,7 +1126,6 @@ export default {
           showConfirmButton: false,
         });
       } catch (error) {
-        console.error('Error al enviar comentario:', error);
         this.errorMessageVideos = error.response?.data?.message || 'Error al enviar el comentario.';
         await Swal.fire({
           title: 'Error',
@@ -1189,927 +1135,55 @@ export default {
         });
       }
     },
-    handleVideoError(event) {
-      console.error('Error al cargar el video:', event);
-      this.errorMessageVideos = 'No se pudo cargar el video.';
-    },
-  },
-
-
-
-  async deleteScreenshot(screenshotId) {
-    const result = await Swal.fire({
-      title: '¿Estás seguro?',
-      text: '¿Quieres eliminar esta captura?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#ff6f61',
-      cancelButtonColor: '#2a2a3f',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
-    });
-
-    if (!result.isConfirmed) return;
-
-    try {
-      axios.defaults.baseURL = 'http://localhost:8000';
-      axios.defaults.withCredentials = true;
-      await axios.get('sanctum/csrf-cookie');
-      const token = localStorage.getItem('auth_token');
-      if (!token) {
-        throw new Error('No se encontró el token de autenticación.');
-      }
-      await axios.delete(`/api/screenshots/${screenshotId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      this.screenshots = this.screenshots.filter(s => s.id !== screenshotId);
-      this.errorMessageScreenshots = '';
-      this.closeScreenshotModal();
-      await Swal.fire({
-        title: '¡Eliminado!',
-        text: 'La captura ha sido eliminada.',
-        icon: 'success',
-        timer: 2000,
-        showConfirmButton: false,
-      });
-      // Navigate to /comunidad/capturas after successful deletion
-      if (this.$route.path !== '/comunidad/capturas') {
-        this.$router.push('/comunidad/capturas');
-      }
-    } catch (error) {
-      console.error('Error al eliminar captura:', error);
-      this.errorMessageScreenshots = error.response
-        ? `Error ${error.response.status}: ${error.response.data.message || error.response.statusText}`
-        : error.message;
-      await Swal.fire({
-        title: 'Error',
-        text: `No se pudo eliminar la captura: ${this.errorMessageScreenshots}`,
-        icon: 'error',
+    async deleteScreenshot(screenshotId) {
+      const result = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: '¿Quieres eliminar esta captura?',
+        icon: 'warning',
+        showCancelButton: true,
         confirmButtonColor: '#ff6f61',
+        cancelButtonColor: '#2a3f2a',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
       });
-    }
+      if (!result.isConfirmed) return;
+      try {
+        axios.defaults.baseURL = 'http://localhost:8000';
+        axios.defaults.withCredentials = true;
+        await axios.get('sanctum/csrf-cookie');
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+          throw new Error('No se encontró el token de autenticación.');
+        }
+        await axios.delete(`/api/screenshots/${screenshotId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        this.screenshots = this.screenshots.filter(s => s.id !== screenshotId);
+        this.closeScreenshotModal();
+        await Swal.fire({
+          title: '¡Eliminado!',
+          text: 'La captura ha sido eliminada.',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        if (this.$route.path !== '/comunidad/capturas') {
+          this.$router.push('/comunidad/capturas');
+        }
+      } catch (error) {
+        this.errorMessageScreenshots = error.response
+          ? `Error ${error.response.status}: ${error.response.data.message || error.response.statusText}`
+          : error.message;
+        await Swal.fire({
+          title: 'Error',
+          text: `No se pudo eliminar la captura: ${this.errorMessageScreenshots}`,
+          icon: 'error',
+          confirmButtonColor: '#ff6f61',
+        });
+      }
+    },
   },
 };
 </script>
 
-<style scoped>
-/* Community Container */
-.community-container {
-  font-family: 'Press Start 2P', cursive;
-  background: url('@/assets/background-retro.png') no-repeat center center fixed;
-  background-size: cover;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: #fff;
-}
-
-/* Nav Container */
-.nav-container {
-  width: 100%;
-  background-color: rgba(0, 0, 0, 0.85);
-  padding: 15px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-}
-
-.logo-link {
-  text-decoration: none;
-  font-size: 1.5em;
-  color: #ffcc00;
-  text-shadow: 2px 2px #000;
-  transition: color 0.3s;
-}
-
-.logo-link:hover {
-  color: #ffffff;
-}
-
-.nav-container ul {
-  list-style: none;
-  display: flex;
-  gap: 20px;
-  margin: 0;
-  padding: 0 20px;
-}
-
-.nav-container ul li a,
-.nav-container ul li button.logout-btn {
-  color: #ffcc00;
-  text-decoration: none;
-  font-size: 1em;
-  display: flex;
-  align-items: center;
-  transition: color 0.3s;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.nav-container ul li a .icon,
-.nav-container ul li button.logout-btn .icon {
-  margin-right: 8px;
-  font-size: 1.2em;
-}
-
-.nav-container ul li a:hover,
-.nav-container ul li button.logout-btn:hover {
-  color: #ffffff;
-}
-
-.nav-container ul li a.active {
-  color: #ffffff;
-  font-weight: bold;
-}
-
-.coming-soon span {
-  color: #888;
-  font-style: italic;
-  cursor: not-allowed;
-}
-
-/* Tabs Container */
-.tabs-container {
-  width: 85%;
-  max-width: 900px;
-  background: rgba(0, 0, 0, 0.6);
-  padding: 10px 0;
-  display: flex;
-  justify-content: flex-start;
-  border-bottom: 2px solid #ffcc00;
-}
-
-.tab {
-  padding: 10px 20px;
-  color: #ffcc00;
-  text-decoration: none;
-  font-size: 0.9em;
-  text-transform: uppercase;
-  transition: color 0.3s, background-color 0.3s;
-}
-
-.tab:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.tab.active {
-  background: #ffcc00;
-  color: #000;
-  font-weight: bold;
-}
-
-/* Main Content */
-.main-content {
-  width: 85%;
-  max-width: 900px;
-  margin: 20px 0;
-  flex-grow: 1;
-}
-
-.content-section {
-  background: rgba(0, 0, 0, 0.6);
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 20px #000;
-}
-
-.content-section h2 {
-  color: #ffcc00;
-  font-size: 1.8em;
-  text-shadow: 2px 2px #000;
-  margin-bottom: 20px;
-  border-bottom: 2px solid #ffcc00;
-  padding-bottom: 10px;
-}
-
-/* Todo Content */
-.todo-content {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.todo-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.todo-section {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.no-content-placeholder {
-  text-align: center;
-  padding: 20px;
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: 5px;
-}
-
-.no-content-placeholder p {
-  color: #888;
-  font-size: 1em;
-  margin: 5px 0;
-}
-
-.content-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 15px;
-}
-
-/* Content Cards */
-.content-card {
-  background: rgba(0, 0, 0, 0.7);
-  border: 4px solid #ffcc00;
-  border-radius: 10px;
-  overflow: hidden;
-  transition: transform 0.3s, box-shadow 0.3s;
-  cursor: pointer;
-}
-
-.content-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 0 15px #ffcc00;
-}
-
-/* Guides Section */
-.guides-header,
-.screenshots-header,
-.videos-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
-}
-
-.header-left h2 {
-  margin: 0;
-  color: #ffcc00;
-  text-shadow: 2px 2px #000;
-}
-
-.header-right {
-  display: flex;
-  gap: 10px;
-}
-
-.filter-btn {
-  background: #000;
-  color: #ffcc00;
-  padding: 8px 15px;
-  border: 2px solid #ffcc00;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.8em;
-  text-transform: uppercase;
-  transition: background-color 0.3s, color 0.3s;
-}
-
-.filter-btn:hover,
-.filter-btn.active {
-  background: #ffcc00;
-  color: #000;
-}
-
-.create-guide-btn,
-.upload-screenshot-btn,
-.upload-video-btn {
-  background: #ffcc00;
-  color: #000;
-  padding: 8px 15px;
-  border-radius: 5px;
-  font-weight: bold;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  transition: background-color 0.3s;
-}
-
-.create-guide-btn .icon,
-.upload-screenshot-btn .icon,
-.upload-video-btn .icon {
-  margin-right: 5px;
-}
-
-.create-guide-btn:hover,
-.upload-screenshot-btn:hover,
-.upload-video-btn:hover {
-  background: #ffffff;
-}
-
-/* Placeholder Styles */
-.no-guides-placeholder,
-.no-screenshots-placeholder,
-.no-videos-placeholder {
-  text-align: center;
-  padding: 40px;
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: 5px;
-}
-
-.placeholder-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.placeholder-icon {
-  font-size: 3em;
-  color: #ffcc00;
-  text-shadow: 2px 2px #000;
-  margin-bottom: 15px;
-}
-
-.no-guides-placeholder p,
-.no-screenshots-placeholder p,
-.no-videos-placeholder p {
-  color: #888;
-  font-size: 1em;
-}
-
-/* Guide Cards */
-.guides-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 15px;
-}
-
-.guide-card {
-  background: rgba(0, 0, 0, 0.7);
-  border: 4px solid #ffcc00;
-  border-radius: 10px;
-  overflow: hidden;
-  transition: transform 0.3s, box-shadow 0.3s;
-  cursor: pointer;
-}
-
-.guide-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 0 15px #ffcc00;
-}
-
-.guide-card-image {
-  width: 100%;
-  height: 150px;
-  background: #000;
-}
-
-.guide-card-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.no-image-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #888;
-  font-size: 0.9em;
-  background: #000;
-}
-
-.guide-card-content {
-  padding: 10px;
-}
-
-.guide-title {
-  margin: 0 0 5px;
-  color: #ffcc00;
-  font-size: 1.2em;
-  text-shadow: 2px 2px #000;
-}
-
-.guide-description {
-  color: #fff;
-  font-size: 0.8em;
-  line-height: 1.6;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Screenshot Cards */
-.screenshots-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 15px;
-}
-
-.screenshot-card {
-  background: rgba(0, 0, 0, 0.7);
-  border: 4px solid #ffcc00;
-  border-radius: 10px;
-  overflow: hidden;
-  transition: transform 0.3s, box-shadow 0.3s;
-  cursor: pointer;
-}
-
-.screenshot-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 0 15px #ffcc00;
-}
-
-.screenshot-image {
-  width: 100%;
-  height: 150px;
-  background: #000;
-}
-
-.screenshot-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.screenshot-meta {
-  padding: 10px;
-  color: #ffcc00;
-  font-size: 1em;
-  text-align: center;
-  text-shadow: 1px 1px #000;
-}
-
-/* Video Cards */
-.videos-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 15px;
-}
-
-.video-card {
-  background: rgba(0, 0, 0, 0.7);
-  border: 4px solid #ffcc00;
-  border-radius: 10px;
-  overflow: hidden;
-  transition: transform 0.3s, box-shadow 0.3s;
-  cursor: pointer;
-  position: relative;
-}
-
-.video-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 0 15px #ffcc00;
-}
-
-.video-thumbnail {
-  width: 100%;
-  height: 150px;
-  background: #000;
-  position: relative;
-}
-
-.video-thumbnail img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.play-icon {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 2em;
-  color: #ffcc00;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 50%;
-  padding: 10px;
-  text-shadow: 2px 2px #000;
-}
-
-.video-meta {
-  padding: 10px;
-  color: #ffcc00;
-  font-size: 1em;
-  text-align: center;
-  text-shadow: 1px 1px #000;
-}
-
-/* Upload Form Modal */
-.upload-form-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.85);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 100;
-}
-
-.upload-form {
-  background: rgba(0, 0, 0, 0.7);
-  padding: 20px;
-  border: 4px solid #ffcc00;
-  border-radius: 10px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 0 20px #000;
-}
-
-.upload-form h3 {
-  color: #ffcc00;
-  font-size: 1.2em;
-  text-shadow: 2px 2px #000;
-  margin-top: 0;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-group label {
-  color: #ffcc00;
-  font-size: 0.9em;
-  margin-bottom: 5px;
-  display: block;
-  text-shadow: 1px 1px #000;
-}
-
-.form-group input[type="text"],
-.form-group input[type="file"],
-.form-group textarea {
-  width: 100%;
-  padding: 8px;
-  border: 2px solid #ffcc00;
-  border-radius: 5px;
-  background: rgba(0, 0, 0, 0.8);
-  color: #fff;
-  font-family: 'Arial', sans-serif;
-  box-sizing: border-box;
-}
-
-.form-group textarea {
-  resize: vertical;
-}
-
-.form-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.submit-btn,
-.cancel-btn {
-  padding: 8px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.8em;
-  font-weight: bold;
-  transition: background-color 0.3s;
-}
-
-.submit-btn {
-  background: #ffcc00;
-  color: #000;
-}
-
-.submit-btn:hover {
-  background: #ffffff;
-}
-
-.cancel-btn {
-  background: #111;
-  color: #ffcc00;
-}
-
-.cancel-btn:hover {
-  background: #ffffff;
-  color: #000;
-}
-
-/* Screenshot and Video Modals */
-.screenshot-modal,
-.video-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.85);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 200;
-  overflow-y: auto;
-}
-
-.modal-content {
-  background: rgba(0, 0, 0, 0.7);
-  border: 4px solid #ffcc00;
-  border-radius: 10px;
-  width: 90%;
-  max-width: 900px;
-  display: flex;
-  flex-direction: row;
-  position: relative;
-  margin: 20px 0;
-  box-shadow: 0 0 20px #000;
-}
-
-.close-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  border: none;
-  color: #ffcc00;
-  font-size: 1.5em;
-  cursor: pointer;
-  transition: color 0.3s;
-}
-
-.close-btn:hover {
-  color: #ffffff;
-}
-
-.modal-image,
-.modal-video {
-  flex: 1;
-  padding: 20px;
-}
-
-.modal-image img {
-  width: 100%;
-  height: auto;
-  max-height: 80vh;
-  object-fit: contain;
-  border: 4px solid #ffcc00;
-  border-radius: 10px;
-}
-
-.video-player {
-  width: 100%;
-  max-height: 80vh;
-  border: 4px solid #ffcc00;
-  border-radius: 10px;
-}
-
-.modal-details {
-  flex: 0.5;
-  padding: 20px;
-  background: rgba(0, 0, 0, 0.8);
-  border-radius: 0 10px 10px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.modal-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.modal-meta span {
-  color: #ffcc00;
-  font-size: 1em;
-  text-shadow: 1px 1px #000;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.modal-actions .action-btn {
-  background: #000;
-  color: #ffcc00;
-  padding: 5px 10px;
-  border: 2px solid #ffcc00;
-  border-radius: 5px;
-  font-size: 0.8em;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
-}
-
-.modal-actions .action-btn:hover {
-  background: #ffcc00;
-  color: #000;
-}
-
-.modal-actions .action-btn.liked {
-  background: #ffcc00;
-  color: #000;
-}
-
-.modal-actions .action-btn.dislike-btn.disliked {
-  background: #ff0000;
-  color: #fff;
-}
-
-.comments-section {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.comments-section h3 {
-  color: #ffcc00;
-  font-size: 1.2em;
-  text-shadow: 2px 2px #000;
-  margin: 0;
-}
-
-.no-comments {
-  text-align: center;
-  color: #888;
-}
-
-.no-comments p {
-  margin: 0;
-  font-size: 0.9em;
-}
-
-.comments-list {
-  max-height: 300px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.comment {
-  background: rgba(0, 0, 0, 0.7);
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ffcc00;
-}
-
-.comment-user {
-  font-weight: bold;
-  color: #ffcc00;
-  margin-right: 5px;
-  text-shadow: 1px 1px #000;
-}
-
-.comment-text {
-  margin: 5px 0 0;
-  color: #fff;
-  font-size: 0.8em;
-}
-
-.comment-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.comment-form textarea {
-  width: 100%;
-  padding: 8px;
-  border: 2px solid #ffcc00;
-  border-radius: 5px;
-  background: rgba(0, 0, 0, 0.8);
-  color: #fff;
-  font-family: 'Arial', sans-serif;
-  resize: vertical;
-}
-
-.submit-comment-btn {
-  background: #ffcc00;
-  color: #000;
-  padding: 8px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.8em;
-  font-weight: bold;
-  transition: background-color 0.3s;
-}
-
-.submit-comment-btn:hover {
-  background: #ffffff;
-}
-
-.comment-actions {
-  margin-top: 10px;
-}
-
-.view-details-btn {
-  background: #000;
-  color: #ffcc00;
-  padding: 8px 15px;
-  border: 2px solid #ffcc00;
-  border-radius: 5px;
-  text-decoration: none;
-  font-size: 0.8em;
-  transition: background-color 0.3s, color 0.3s;
-}
-
-.view-details-btn:hover {
-  background: #ffcc00;
-  color: #000;
-}
-
-/* Loading and Error Messages */
-.loading-message {
-  text-align: center;
-  color: #ffcc00;
-  font-size: 1em;
-  text-shadow: 1px 1px #000;
-}
-
-.error-message {
-  text-align: center;
-  color: #ff0000;
-  font-size: 1em;
-  font-weight: bold;
-  text-shadow: 1px 1px #000;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .main-content {
-    width: 95%;
-  }
-
-  .tabs-container {
-    width: 95%;
-    flex-wrap: wrap;
-  }
-
-  .tab {
-    padding: 8px 15px;
-    font-size: 0.8em;
-  }
-
-  .content-list,
-  .guides-list,
-  .screenshots-list,
-  .videos-list {
-    grid-template-columns: 1fr;
-  }
-
-  .modal-content {
-    flex-direction: column;
-    width: 95%;
-  }
-
-  .modal-image,
-  .modal-video {
-    padding: 10px;
-  }
-
-  .modal-details {
-    border-radius: 0 0 10px 10px;
-  }
-
-  .modal-actions {
-    flex-wrap: wrap;
-  }
-
-  .comments-list {
-    max-height: 200px;
-  }
-
-  .todo-header,
-  .guides-header,
-  .screenshots-header,
-  .videos-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .nav-container ul {
-    padding: 0 10px;
-    gap: 10px;
-  }
-
-  .nav-container ul li {
-    margin: 0 5px;
-  }
-
-  .nav-container ul li a,
-  .nav-container ul li button.logout-btn {
-    font-size: 0.9em;
-  }
-}
-</style>
+<style src="@/assets/styles/Guides/CommunityView.css" scoped></style>

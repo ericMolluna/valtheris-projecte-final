@@ -5,20 +5,35 @@
       <div class="logo">
         <router-link to="/" class="logo-link">🎮 Valtheris</router-link>
       </div>
-      <ul>
+      <button class="menu-toggle" @click="toggleMenu" aria-label="Toggle Menu">
+        ☰
+      </button>
+      <ul :class="{ 'nav-links': true, 'nav-links-open': isMenuOpen }">
         <li>
-          <router-link to="/juego"><i class="icon">🎮</i> Jugar</router-link>
+          <router-link to="/juego" class="nav-item">
+            <span class="icon">🎮</span> Jugar
+          </router-link>
         </li>
         <li class="dropdown" data-testid="comunidad-item">
-          <router-link to="/comunidad" class="dropdown-toggle">
-            <i class="icon">👥</i> Comunidad
-          </router-link>
+          <span class="dropdown-toggle" @click="toggleDropdown" aria-haspopup="true" :aria-expanded="isDropdownOpen">
+            <span class="icon">👥</span> Comunidad
+          </span>
+          <ul class="dropdown-menu" v-show="isDropdownOpen">
+            <li><router-link to="/comunidad/capturas" class="dropdown-item">Capturas</router-link></li>
+            <li><router-link to="/comunidad/guias" class="dropdown-item">Guías</router-link></li>
+            <li><router-link to="/videos" class="dropdown-item">Videos</router-link></li>
+          </ul>
         </li>
         <li>
-          <router-link :to="isAuthenticated ? '/perfil' : '/login'">
-            <i class="icon">{{ isAuthenticated ? '👤' : '🔑' }}</i>
+          <router-link :to="isAuthenticated ? '/perfil' : '/login'" class="nav-item">
+            <span class="icon">{{ isAuthenticated ? '👤' : '🔑' }}</span>
             {{ isAuthenticated ? 'Perfil' : 'Login' }}
           </router-link>
+        </li>
+        <li v-if="isAuthenticated">
+          <button class="nav-item logout-btn" @click="handleLogout" aria-label="Cerrar Sesión">
+            <span class="icon">🚪</span> Cerrar Sesión
+          </button>
         </li>
       </ul>
     </nav>
@@ -33,8 +48,7 @@
             <p>Explora capturas del juego compartidas por la comunidad.</p>
           </div>
           <div class="header-right">
-            <button :class="{ 'filter-btn': true, 'active': sortFilter === 'popular' }"
-              @click="setSortFilter('popular')">
+            <button :class="{ 'filter-btn': true, 'active': sortFilter === 'popular' }" @click="setSortFilter('popular')">
               Más Populares
             </button>
             <button :class="{ 'filter-btn': true, 'active': sortFilter === 'recent' }" @click="setSortFilter('recent')">
@@ -42,7 +56,7 @@
             </button>
           </div>
           <button v-if="isAuthenticated" @click="showUploadForm = true" class="upload-screenshot-btn">
-            <i class="icon">📸</i> Subir Captura
+            <span class="icon">📸</span> Subir Captura
           </button>
         </div>
 
@@ -52,13 +66,23 @@
             <h3>Subir Nueva Captura</h3>
             <form @submit.prevent="uploadScreenshot">
               <div class="form-group">
-                <label for="screenshot-image">Seleccionar Imagen</label>
-                <input type="file" id="screenshot-image" accept="image/*" @change="handleFileChange" required />
+                <label for="screenshot-title">Título</label>
+                <input type="text" id="screenshot-title" v-model="newScreenshot.title" placeholder="Título de tu captura..." required maxlength="100" />
               </div>
-
+              <div class="form-group">
+                <label for="screenshot-image">Seleccionar Imagen</label>
+                <input type="file" id="screenshot-image" accept="image/*" @change="handleFileChange" required ref="fileInput" />
+                <div v-if="imagePreview" class="image-preview">
+                  <img :src="imagePreview" alt="Vista previa de la imagen" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="screenshot-description">Descripción (Opcional)</label>
+                <textarea id="screenshot-description" v-model="newScreenshot.description" placeholder="Describe tu captura..." maxlength="500"></textarea>
+              </div>
               <div class="form-actions">
-                <button type="submit" class="submit-btn">Subir</button>
-                <button type="button" class="cancel-btn" @click="showUploadForm = false">Cancelar</button>
+                <button type="submit" class="submit-btn" :disabled="isUploading">Subir</button>
+                <button type="button" class="cancel-btn" @click="closeUploadForm">Cancelar</button>
               </div>
               <p v-if="uploadError" class="error-message">{{ uploadError }}</p>
             </form>
@@ -66,7 +90,7 @@
         </div>
 
         <!-- Lista de capturas o placeholder -->
-        <div v-if="loadingScreenshots" class="loading-message">
+        <div v-if="loadingScreenshots && !screenshots.length" class="loading-message">
           Cargando capturas...
         </div>
         <div v-else-if="errorMessage" class="error-message">
@@ -74,21 +98,31 @@
         </div>
         <div v-else-if="screenshots.length === 0" class="no-screenshots-placeholder">
           <div class="placeholder-content">
-            <i class="placeholder-icon">📸</i>
+            <span class="placeholder-icon">📸</span>
             <p>No hay capturas disponibles todavía.</p>
             <p>¡Sé el primero en compartir tus momentos en el juego!</p>
           </div>
         </div>
-        <div v-else class="screenshots-list">
-          <div class="screenshot-card" v-for="screenshot in screenshots" :key="screenshot.id"
-            @click="openScreenshotModal(screenshot)">
+        <div v-else class="screenshots-list" ref="screenshotsList">
+          <div class="screenshot-card" v-for="screenshot in screenshots" :key="screenshot.id" @click="openScreenshotModal(screenshot)">
             <div class="screenshot-image">
               <img :src="screenshot.image_url" alt="Captura del juego" @error="handleImageError" />
             </div>
             <div class="screenshot-meta">
               <span>Subido por: {{ screenshot.user?.name || 'Anónimo' }}</span>
+              <div class="quick-actions">
+                <button class="quick-action-btn" @click.stop="likeScreenshot(screenshot.id)" :disabled="!isAuthenticated || screenshot.user_liked || screenshot.user_disliked">
+                  <span class="icon">👍</span> {{ screenshot.likes || 0 }}
+                </button>
+                <button class="quick-action-btn" @click.stop="dislikeScreenshot(screenshot.id)" :disabled="!isAuthenticated || screenshot.user_liked || screenshot.user_disliked">
+                  <span class="icon">👎</span> {{ screenshot.dislikes || 0 }}
+                </button>
+              </div>
             </div>
           </div>
+        </div>
+        <div v-if="loadingMore" class="loading-message">
+          Cargando más capturas...
         </div>
       </div>
     </div>
@@ -96,7 +130,7 @@
     <!-- Modal para mostrar la captura en tamaño completo con comentarios -->
     <div v-if="selectedScreenshot" class="screenshot-modal">
       <div class="modal-content">
-        <button class="close-btn" @click="closeScreenshotModal">✖</button>
+        <button class="close-btn" @click="closeScreenshotModal" aria-label="Cerrar modal">✖</button>
         <div class="modal-image">
           <img :src="selectedScreenshot.image_url" alt="Captura del juego en tamaño completo" />
         </div>
@@ -104,58 +138,68 @@
           <div class="modal-meta">
             <span>Subido por: {{ selectedScreenshot.user?.name || 'Anónimo' }}</span>
             <div class="modal-actions">
-              <button class="action-btn"
-                :disabled="!isAuthenticated || (selectedScreenshot.user_liked || selectedScreenshot.user_disliked)"
-                @click="likeScreenshot(selectedScreenshot.id)">
-                <i class="icon">👍</i> Me Tonto ({{ selectedScreenshot.likes || 0 }})
+              <button class="action-btn" :disabled="!isAuthenticated || (selectedScreenshot.user_liked || selectedScreenshot.user_disliked)" @click="likeScreenshot(selectedScreenshot.id)">
+                <span class="icon">👍</span> Me Tonto ({{ selectedScreenshot.likes || 0 }})
               </button>
-              <button class="action-btn"
-                :disabled="!isAuthenticated || (selectedScreenshot.user_liked || selectedScreenshot.user_disliked)"
-                @click="dislikeScreenshot(selectedScreenshot.id)">
-                <i class="icon">👎</i> No me gusta ({{ selectedScreenshot.dislikes || 0 }})
+              <button class="action-btn" :disabled="!isAuthenticated || (selectedScreenshot.user_liked || selectedScreenshot.user_disliked)" @click="dislikeScreenshot(selectedScreenshot.id)">
+                <span class="icon">👎</span> No me gusta ({{ selectedScreenshot.dislikes || 0 }})
               </button>
-              <button class="action-btn"><i class="icon">🏆</i> Premiar</button>
-              <button v-if="isAuthenticated && user && selectedScreenshot.user_id === user.id"
-                @click="deleteScreenshot(selectedScreenshot.id)" class="delete-btn">
-                <i class="icon">🗑️</i> Eliminar
+              <button class="action-btn"><span class="icon">🏆</span> Premiar</button>
+              <button v-if="isAuthenticated && user && selectedScreenshot.user_id === user.id" @click="deleteScreenshot(selectedScreenshot.id)" class="delete-btn">
+                <span class="icon">🗑️</span> Eliminar
               </button>
             </div>
           </div>
           <div class="comments-section">
             <h3>Comentarios</h3>
-            <div v-if="comments.length === 0" class="no-comments">
+            <div v-if="loadingComments" class="loading-message">
+              Cargando comentarios...
+            </div>
+            <div v-else-if="comments.length === 0" class="no-comments">
               <p>No hay comentarios todavía. ¡Sé el primero en comentar!</p>
             </div>
             <div v-else class="comments-list">
               <div v-for="comment in comments" :key="comment.id" class="comment">
                 <span class="comment-user">{{ comment.user?.name || 'Anónimo' }}:</span>
                 <p class="comment-text">{{ comment.text }}</p>
-                <button v-if="isAuthenticated && user && comment.user_id === user.id" @click="deleteComment(comment.id)"
-                  class="delete-comment-btn">
-                  <i class="icon">🗑️</i> Eliminar
+                <button v-if="isAuthenticated && user && comment.user_id === user.id" @click="deleteComment(comment.id)" class="delete-comment-btn">
+                  <span class="icon">🗑️</span> Eliminar
                 </button>
               </div>
             </div>
             <div v-if="isAuthenticated" class="comment-form">
-              <textarea v-model="newComment" placeholder="Añade un comentario..." rows="2"></textarea>
-              <button @click="submitComment" class="submit-comment-btn">Comentar</button>
+              <textarea v-model="newComment" placeholder="Añade un comentario..." rows="2" maxlength="280" aria-label="Escribe un comentario"></textarea>
+              <div class="comment-counter" :class="{ 'warning': newComment.length > 260 }">
+                {{ newComment.length }}/280
+              </div>
+              <button @click="submitComment" class="submit-comment-btn" :disabled="!newComment.trim()">Comentar</button>
             </div>
-            <div class="comment-actions">
-              <router-link :to="`/captura/${selectedScreenshot.id}`" class="view-details-btn">
-                Ver más detalles
-              </router-link>
+            <div v-else class="login-to-comment">
+              <p><router-link to="/login">Inicia sesión</router-link> para comentar.</p>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="footer-section">
+      <div class="footer-content">
+        <p>&copy; 2025 Valtheris. Todos los derechos reservados.</p>
+        <div class="social-links">
+          <a href="#" class="social-icon" aria-label="Twitter">🐦</a>
+          <a href="#" class="social-icon" aria-label="Discord">💬</a>
+          <a href="#" class="social-icon" aria-label="Instagram">📸</a>
+        </div>
+      </div>
+    </footer>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
+import Swal from 'sweetalert2';
 import { isAuthenticated } from '@/api/auth';
-import '@/assets/styles/Screenshots/ScreenshotsView.css';
 
 export default {
   name: 'ScreenshotsView',
@@ -164,29 +208,55 @@ export default {
       isAuthenticated: localStorage.getItem('auth_token') !== null,
       screenshots: [],
       loadingScreenshots: false,
+      loadingMore: false,
       errorMessage: '',
       showUploadForm: false,
       newScreenshot: {
+        title: '',
         image: null,
+        description: '',
       },
       uploadError: '',
       user: null,
       selectedScreenshot: null,
       comments: [],
+      loadingComments: false,
       newComment: '',
-      sortFilter: 'recent', // Filtro por defecto: Más Recientes
+      sortFilter: 'recent',
+      isMenuOpen: false,
+      isDropdownOpen: false,
+      imagePreview: null,
+      isUploading: false,
+      page: 1,
+      hasMore: true,
     };
   },
   created() {
     window.addEventListener('storage', this.updateAuthStatus);
+    window.addEventListener('scroll', this.handleScroll);
     this.checkAuthStatus();
     this.fetchUserData();
     this.fetchScreenshots();
   },
   beforeUnmount() {
     window.removeEventListener('storage', this.updateAuthStatus);
+    window.removeEventListener('scroll', this.handleScroll);
   },
   methods: {
+    toggleMenu() {
+      this.isMenuOpen = !this.isMenuOpen;
+      if (this.isMenuOpen) this.isDropdownOpen = false;
+    },
+    toggleDropdown() {
+      this.isDropdownOpen = !this.isDropdownOpen;
+    },
+    closeUploadForm() {
+      this.showUploadForm = false;
+      this.newScreenshot = { title: '', image: null, description: '' };
+      this.imagePreview = null;
+      this.uploadError = '';
+      this.$refs.fileInput.value = '';
+    },
     async checkAuthStatus() {
       this.isAuthenticated = await isAuthenticated();
       if (!this.isAuthenticated) {
@@ -220,9 +290,17 @@ export default {
         this.isAuthenticated = false;
       }
     },
-    async fetchScreenshots() {
-      this.loadingScreenshots = true;
-      this.errorMessage = '';
+    async fetchScreenshots(append = false) {
+      if (this.loadingScreenshots || this.loadingMore || !this.hasMore) return;
+
+      if (!append) {
+        this.loadingScreenshots = true;
+        this.page = 1;
+        this.screenshots = [];
+      } else {
+        this.loadingMore = true;
+      }
+
       try {
         axios.defaults.baseURL = 'http://localhost:8000';
         axios.defaults.withCredentials = true;
@@ -230,9 +308,11 @@ export default {
         const response = await axios.get('/api/screenshots', {
           params: {
             sort: this.sortFilter,
+            page: this.page,
+            per_page: 12,
           },
         });
-        this.screenshots = response.data.map(screenshot => ({
+        const newScreenshots = response.data.data.map(screenshot => ({
           ...screenshot,
           image_url: `http://localhost:8000${screenshot.image_url}`,
           likes: screenshot.likes || 0,
@@ -240,19 +320,32 @@ export default {
           user_liked: screenshot.user_liked || false,
           user_disliked: screenshot.user_disliked || false,
         }));
+        this.screenshots = append ? [...this.screenshots, ...newScreenshots] : newScreenshots;
+        this.hasMore = response.data.current_page < response.data.last_page;
+        if (this.hasMore) this.page += 1;
       } catch (error) {
-        const errorMsg = error.response
+        this.errorMessage = error.response
           ? `${error.response.status}: ${error.response.data.message || error.response.statusText}`
           : error.message;
-        this.errorMessage = errorMsg;
         this.screenshots = [];
       } finally {
         this.loadingScreenshots = false;
+        this.loadingMore = false;
+      }
+    },
+    handleScroll() {
+      const list = this.$refs.screenshotsList;
+      if (!list) return;
+      const bottomOfWindow = window.innerHeight + window.scrollY >= document.documentElement.offsetHeight - 100;
+      if (bottomOfWindow && !this.loadingMore && this.hasMore) {
+        this.fetchScreenshots(true);
       }
     },
     setSortFilter(filter) {
-      this.sortFilter = filter;
-      this.fetchScreenshots();
+      if (this.sortFilter !== filter) {
+        this.sortFilter = filter;
+        this.fetchScreenshots();
+      }
     },
     handleImageError(event) {
       event.target.style.display = 'none';
@@ -262,99 +355,154 @@ export default {
       event.target.parentNode.appendChild(placeholder);
     },
     handleFileChange(event) {
-      this.newScreenshot.image = event.target.files[0];
+      const file = event.target.files[0];
+      this.newScreenshot.image = file;
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          this.imagePreview = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        this.imagePreview = null;
+      }
     },
     async uploadScreenshot() {
       if (!this.newScreenshot.image) {
         this.uploadError = 'Por favor, selecciona una imagen válida.';
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: this.uploadError,
+          confirmButtonColor: '#ff0066',
+        });
         return;
       }
-
+      if (!this.newScreenshot.title.trim()) {
+        this.uploadError = 'Por favor, proporciona un título.';
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: this.uploadError,
+          confirmButtonColor: '#ff0066',
+        });
+        return;
+      }
       const maxSize = 2048 * 1024;
       if (this.newScreenshot.image.size > maxSize) {
         this.uploadError = 'La imagen excede el tamaño máximo de 2MB.';
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: this.uploadError,
+          confirmButtonColor: '#ff0066',
+        });
         return;
       }
       if (!this.newScreenshot.image.type.startsWith('image/')) {
         this.uploadError = 'El archivo seleccionado no es una imagen válida.';
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: this.uploadError,
+          confirmButtonColor: '#ff0066',
+        });
         return;
       }
 
       const formData = new FormData();
+      formData.append('title', this.newScreenshot.title);
       formData.append('image', this.newScreenshot.image);
+      formData.append('description', this.newScreenshot.description || '');
 
       try {
+        this.isUploading = true;
         axios.defaults.baseURL = 'http://localhost:8000';
         axios.defaults.withCredentials = true;
         await axios.get('sanctum/csrf-cookie');
         const token = localStorage.getItem('auth_token');
-        if (!token) {
-          throw new Error('No se encontró el token de autenticación. Por favor, inicia sesión nuevamente.');
-        }
-        const response = await axios.post('/api/screenshots', formData, {
+        if (!token) throw new Error('No se encontró el token de autenticación.');
+        await axios.post('/api/screenshots', formData, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data',
           },
         });
-        this.showUploadForm = false;
-        this.newScreenshot = { image: null, description: '' };
-        this.uploadError = '';
+        this.closeUploadForm();
         await this.fetchScreenshots();
+        Swal.fire({
+          icon: 'success',
+          title: '¡Captura subida!',
+          text: 'Tu captura ha sido subida exitosamente.',
+          timer: 2000,
+          showConfirmButton: false,
+        });
       } catch (error) {
-        console.error('Error al subir captura:', error);
-        if (error.response) {
-          const status = error.response.status;
-          const message = error.response.data.message || 'Error desconocido';
-          if (status === 422) {
-            this.uploadError = `Validación fallida: ${message}`;
-            if (error.response.data.errors) {
-              const errors = Object.values(error.response.data.errors).flat().join(', ');
-              this.uploadError += ` (${errors})`;
-            }
-          } else if (status === 401) {
-            this.uploadError = 'No estás autenticado. Por favor, inicia sesión.';
-          } else if (status === 500) {
-            this.uploadError = 'Error interno del servidor. Por favor, intenta de nuevo más tarde.';
-          } else {
-            this.uploadError = `Error ${status}: ${message}`;
-          }
-        } else if (error.request) {
-          this.uploadError = 'No se pudo conectar al servidor. Verifica tu conexión.';
-        } else {
-          this.uploadError = `Error: ${error.message}`;
-        }
+        this.uploadError = error.response
+          ? error.response.data.message || `Error ${error.response.status}`
+          : error.message;
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: this.uploadError,
+          confirmButtonColor: '#ff0066',
+        });
+      } finally {
+        this.isUploading = false;
       }
     },
     async deleteScreenshot(screenshotId) {
-      if (!confirm('¿Estás seguro de que quieres eliminar esta captura?')) return;
+      const result = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: 'Esta acción no se puede deshacer.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ff0066',
+        cancelButtonColor: '#2a2a3f',
+        confirmButtonText: 'Eliminar',
+        cancelButtonText: 'Cancelar',
+      });
+      if (!result.isConfirmed) return;
 
       try {
         axios.defaults.baseURL = 'http://localhost:8000';
         axios.defaults.withCredentials = true;
         await axios.get('sanctum/csrf-cookie');
         const token = localStorage.getItem('auth_token');
-        if (!token) {
-          throw new Error('No se encontró el token de autenticación.');
-        }
+        if (!token) throw new Error('No se encontró el token de autenticación.');
         await axios.delete(`/api/screenshots/${screenshotId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         this.screenshots = this.screenshots.filter(s => s.id !== screenshotId);
-        this.errorMessage = '';
         this.closeScreenshotModal();
+        Swal.fire({
+          icon: 'success',
+          title: '¡Eliminado!',
+          text: 'La captura ha sido eliminada.',
+          timer: 2000,
+          showConfirmButton: false,
+        });
       } catch (error) {
-        console.error('Error al eliminar captura:', error);
         this.errorMessage = error.response
           ? `Error ${error.response.status}: ${error.response.data.message || error.response.statusText}`
           : error.message;
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: this.errorMessage,
+          confirmButtonColor: '#ff0066',
+        });
       }
     },
     async likeScreenshot(screenshotId) {
       if (!this.isAuthenticated) {
-        alert('Debes iniciar sesión para dar "Me gusta".');
+        Swal.fire({
+          icon: 'warning',
+          title: 'Inicia sesión',
+          text: 'Debes iniciar sesión para dar "Me gusta".',
+          confirmButtonColor: '#ff0066',
+        });
+        this.$router.push('/login');
         return;
       }
 
@@ -363,36 +511,47 @@ export default {
         axios.defaults.withCredentials = true;
         await axios.get('sanctum/csrf-cookie');
         const token = localStorage.getItem('auth_token');
-        if (!token) {
-          throw new Error('No se encontró el token de autenticación.');
-        }
-        console.log(`Enviando petición a /api/screenshots/${screenshotId}/like con token: ${token}`);
-        const response = await axios.post(`/api/screenshots/${screenshotId}/like`, {}, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        if (!token) throw new Error('No se encontró el token de autenticación.');
+        const method = this.screenshots.find(s => s.id === screenshotId).user_liked ? 'delete' : 'post';
+        const response = await axios({
+          method,
+          url: `/api/screenshots/${screenshotId}/like`,
+          headers: { Authorization: `Bearer ${token}` },
         });
-        console.log('Respuesta del servidor:', response.data);
         const updatedScreenshot = response.data;
-        this.selectedScreenshot.likes = updatedScreenshot.likes;
-        this.selectedScreenshot.dislikes = updatedScreenshot.dislikes;
-        this.selectedScreenshot.user_liked = updatedScreenshot.user_liked;
-        this.selectedScreenshot.user_disliked = updatedScreenshot.user_disliked;
         this.screenshots = this.screenshots.map(s =>
           s.id === screenshotId ? { ...s, ...updatedScreenshot } : s
         );
+        if (this.selectedScreenshot && this.selectedScreenshot.id === screenshotId) {
+          this.selectedScreenshot = { ...this.selectedScreenshot, ...updatedScreenshot };
+        }
+        Swal.fire({
+          icon: 'success',
+          title: updatedScreenshot.user_liked ? '¡Me gusta añadido!' : 'Me gusta eliminado',
+          timer: 1500,
+          showConfirmButton: false,
+        });
       } catch (error) {
-        console.error('Error al dar "Me gusta":', error.response ? error.response.data : error.message);
         const errorMsg = error.response
           ? `Error ${error.response.status}: ${error.response.data.message || error.response.statusText}`
           : error.message;
-        alert(`No se pudo dar "Me gusta": ${errorMsg}`);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: `No se pudo dar "Me gusta": ${errorMsg}`,
+          confirmButtonColor: '#ff0066',
+        });
       }
     },
-
     async dislikeScreenshot(screenshotId) {
       if (!this.isAuthenticated) {
-        alert('Debes iniciar sesión para dar "No me gusta".');
+        Swal.fire({
+          icon: 'warning',
+          title: 'Inicia sesión',
+          text: 'Debes iniciar sesión para dar "No me gusta".',
+          confirmButtonColor: '#ff0066',
+        });
+        this.$router.push('/login');
         return;
       }
 
@@ -401,59 +560,81 @@ export default {
         axios.defaults.withCredentials = true;
         await axios.get('sanctum/csrf-cookie');
         const token = localStorage.getItem('auth_token');
-        if (!token) {
-          throw new Error('No se encontró el token de autenticación.');
-        }
-        console.log(`Enviando petición a /api/screenshots/${screenshotId}/dislike con token: ${token}`);
-        const response = await axios.post(`/api/screenshots/${screenshotId}/dislike`, {}, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        if (!token) throw new Error('No se encontró el token de autenticación.');
+        const method = this.screenshots.find(s => s.id === screenshotId).user_disliked ? 'delete' : 'post';
+        const response = await axios({
+          method,
+          url: `/api/screenshots/${screenshotId}/dislike`,
+          headers: { Authorization: `Bearer ${token}` },
         });
-        console.log('Respuesta del servidor:', response.data);
         const updatedScreenshot = response.data;
-        this.selectedScreenshot.likes = updatedScreenshot.likes;
-        this.selectedScreenshot.dislikes = updatedScreenshot.dislikes;
-        this.selectedScreenshot.user_liked = updatedScreenshot.user_liked;
-        this.selectedScreenshot.user_disliked = updatedScreenshot.user_disliked;
         this.screenshots = this.screenshots.map(s =>
           s.id === screenshotId ? { ...s, ...updatedScreenshot } : s
         );
+        if (this.selectedScreenshot && this.selectedScreenshot.id === screenshotId) {
+          this.selectedScreenshot = { ...this.selectedScreenshot, ...updatedScreenshot };
+        }
+        Swal.fire({
+          icon: 'success',
+          title: updatedScreenshot.user_disliked ? '¡No me gusta añadido!' : 'No me gusta eliminado',
+          timer: 1500,
+          showConfirmButton: false,
+        });
       } catch (error) {
-        console.error('Error al dar "No me gusta":', error.response ? error.response.data : error.message);
         const errorMsg = error.response
           ? `Error ${error.response.status}: ${error.response.data.message || error.response.statusText}`
           : error.message;
-        alert(`No se pudo dar "No me gusta": ${errorMsg}`);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: `No se pudo dar "No me gusta": ${errorMsg}`,
+          confirmButtonColor: '#ff0066',
+        });
       }
     },
     async deleteComment(commentId) {
-      if (!confirm('¿Estás seguro de que quieres eliminar este comentario?')) return;
+      const result = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: 'Esta acción no se puede deshacer.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ff0066',
+        cancelButtonColor: '#2a2a3f',
+        confirmButtonText: 'Eliminar',
+        cancelButtonText: 'Cancelar',
+      });
+      if (!result.isConfirmed) return;
 
       try {
         axios.defaults.baseURL = 'http://localhost:8000';
         axios.defaults.withCredentials = true;
         await axios.get('sanctum/csrf-cookie');
         const token = localStorage.getItem('auth_token');
-        if (!token) {
-          throw new Error('No se encontró el token de autenticación.');
-        }
+        if (!token) throw new Error('No se encontró el token de autenticación.');
         await axios.delete(`/api/screenshots/${this.selectedScreenshot.id}/comments/${commentId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         this.comments = this.comments.filter(comment => comment.id !== commentId);
+        Swal.fire({
+          icon: 'success',
+          title: '¡Comentario eliminado!',
+          timer: 1500,
+          showConfirmButton: false,
+        });
       } catch (error) {
-        console.error('Error al eliminar comentario:', error);
         const errorMsg = error.response
           ? `Error ${error.response.status}: ${error.response.data.message || error.response.statusText}`
           : error.message;
-        alert(`No se pudo eliminar el comentario: ${errorMsg}`);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: `No se pudo eliminar el comentario: ${errorMsg}`,
+          confirmButtonColor: '#ff0066',
+        });
       }
     },
     openScreenshotModal(screenshot) {
-      this.selectedScreenshot = screenshot;
+      this.selectedScreenshot = { ...screenshot };
       this.fetchComments(screenshot.id);
     },
     closeScreenshotModal() {
@@ -462,6 +643,7 @@ export default {
       this.newComment = '';
     },
     async fetchComments(screenshotId) {
+      this.loadingComments = true;
       try {
         axios.defaults.baseURL = 'http://localhost:8000';
         axios.defaults.withCredentials = true;
@@ -469,14 +651,24 @@ export default {
         const response = await axios.get(`/api/screenshots/${screenshotId}/comments`);
         this.comments = response.data;
       } catch (error) {
-        console.error('Error al cargar comentarios:', error);
-        this.comments = [];
-        alert('No se pudieron cargar los comentarios. Por favor, intenta de nuevo.');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudieron cargar los comentarios.',
+          confirmButtonColor: '#ff0066',
+        });
+      } finally {
+        this.loadingComments = false;
       }
     },
     async submitComment() {
       if (!this.newComment.trim()) {
-        alert('Por favor, escribe un comentario antes de enviar.');
+        Swal.fire({
+          icon: 'warning',
+          title: 'Comentario vacío',
+          text: 'Por favor, escribe un comentario.',
+          confirmButtonColor: '#ff0066',
+        });
         return;
       }
 
@@ -485,26 +677,61 @@ export default {
         axios.defaults.withCredentials = true;
         await axios.get('sanctum/csrf-cookie');
         const token = localStorage.getItem('auth_token');
-        if (!token) {
-          throw new Error('No se encontró el token de autenticación. Por favor, inicia sesión nuevamente.');
-        }
-        const response = await axios.post(
+        if (!token) throw new Error('No se encontró el token de autenticación.');
+        await axios.post(
           `/api/screenshots/${this.selectedScreenshot.id}/comments`,
           { text: this.newComment },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
         this.newComment = '';
         await this.fetchComments(this.selectedScreenshot.id);
+        Swal.fire({
+          icon: 'success',
+          title: '¡Comentario enviado!',
+          timer: 1500,
+          showConfirmButton: false,
+        });
       } catch (error) {
-        console.error('Error al enviar comentario:', error);
         const errorMsg = error.response
           ? `Error ${error.response.status}: ${error.response.data.message || error.response.statusText}`
           : error.message;
-        alert(`Hubo un error al enviar el comentario: ${errorMsg}. Por favor, intenta de nuevo.`);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: `No se pudo enviar el comentario: ${errorMsg}`,
+          confirmButtonColor: '#ff0066',
+        });
+      }
+    },
+    async handleLogout() {
+      try {
+        axios.defaults.baseURL = 'http://localhost:8000';
+        axios.defaults.withCredentials = true;
+        await axios.get('sanctum/csrf-cookie');
+        const token = localStorage.getItem('auth_token');
+        if (token) {
+          await axios.post('/api/logout', {}, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+        }
+        localStorage.removeItem('auth_token');
+        this.isAuthenticated = false;
+        this.user = null;
+        this.$router.push('/login');
+        Swal.fire({
+          icon: 'success',
+          title: 'Sesión cerrada',
+          text: 'Has cerrado sesión exitosamente.',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo cerrar la sesión.',
+          confirmButtonColor: '#ff0066',
+        });
       }
     },
   },
