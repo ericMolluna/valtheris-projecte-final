@@ -45,20 +45,22 @@
       <!-- Zone Carousel Section -->
       <section class="zone-carousel-section">
         <h2 class="zone-title">Descubre lo que visitarás</h2>
-        <div class="zone-carousel-container">
-          <button class="carousel-arrow left-arrow" @click="prevZone" :disabled="currentZoneIndex === 0">
+        <div class="carousel-wrapper">
+          <button class="carousel-arrow left-arrow" @click="prevZone">
             <span>⬅</span>
           </button>
-          <div class="zone-carousel-wrapper" :style="{ transform: `translateX(-${currentZoneIndex * 100}%)` }">
-            <div v-for="(zone, index) in zones" :key="index" class="zone-card">
-              <img :src="zone.image" :alt="zone.title" class="zone-image" />
-              <div class="zone-content">
-                <h3 class="zone-name">{{ zone.title }}</h3>
-                <p class="zone-description">{{ zone.description }}</p>
+          <div class="zone-carousel-container">
+            <div class="zone-carousel-wrapper" :style="{ transform: `translateX(-${currentZoneIndex * 33.33}%)` }">
+              <div v-for="(zone, index) in zones" :key="index" class="zone-card">
+                <img :src="zone.image" :alt="zone.title" class="zone-image" />
+                <div class="zone-content">
+                  <h3 class="zone-name">{{ zone.title }}</h3>
+                  <p class="zone-description">{{ zone.description }}</p>
+                </div>
               </div>
             </div>
           </div>
-          <button class="carousel-arrow right-arrow" @click="nextZone" :disabled="currentZoneIndex === zones.length - 1">
+          <button class="carousel-arrow right-arrow" @click="nextZone">
             <span>➡</span>
           </button>
         </div>
@@ -191,7 +193,7 @@ export default {
         {
           title: 'Zona Nevada',
           description: 'Tras una larga bajada por el desierto, encontrarás una zona muy fría, con colores fríos y casas congeladas en ruinas. Una zona muy oscura en contraste con la claridad que se ve desde lejos. Hay algunos comerciantes, pero nadie para ayudar. Solo se ve una gran montaña nevada y muchas más escarpadas.',
-          image: '@/assets/zone-nevada.jpg'
+          image: '@assets/zone-nevada.jpg'
         },
         {
           title: 'Pujat Muntanyista',
@@ -237,6 +239,11 @@ export default {
       currentZoneIndex: 0
     };
   },
+  computed: {
+    totalSlides() {
+      return Math.ceil(this.zones.length / 3);
+    }
+  },
   methods: {
     openModal(index) {
       this.selectedPhase = index;
@@ -250,14 +257,10 @@ export default {
       }
     },
     nextZone() {
-      if (this.currentZoneIndex < this.zones.length - 1) {
-        this.currentZoneIndex++;
-      }
+      this.currentZoneIndex = (this.currentZoneIndex + 1) % this.totalSlides;
     },
     prevZone() {
-      if (this.currentZoneIndex > 0) {
-        this.currentZoneIndex--;
-      }
+      this.currentZoneIndex = (this.currentZoneIndex - 1 + this.totalSlides) % this.totalSlides;
     },
     handleKeydown(event) {
       if (event.key === 'ArrowRight') {
