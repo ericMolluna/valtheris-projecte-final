@@ -4,5 +4,9 @@
   },
   "scripts": {
     "start-all": "concurrently \"cd vue && npm run serve\" \"cd rpg && npx cross-env RPG_TYPE=rpg npm run dev\" \"cd laravel && php artisan serve\""
+  },
+  "dependencies": {
+    "@vueup/vue-quill": "^1.2.0",
+    "dompurify": "^3.2.6"
   }
 }

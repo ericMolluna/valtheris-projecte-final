@@ -4,31 +4,31 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Game from '../components/Game.vue';
 import HomeView from '../views/HomeView.vue';
 import NotFound from '../views/NotFound.vue';
+import AboutView from '../views/AboutView.vue';
 
 // Vistas de autenticación
 import LoginView from '../views/Auth/LoginView.vue';
 import RegisterView from '../views/Auth/RegisterView.vue';
 
 // Vistas de guías
-import CommunityView from '../views/Guides/CommunityView.vue';
+import CommunityView from '../views/CommunityView.vue';
 import GuideView from '../views/Guides/GuideView.vue';
 import CreateGuideView from '../views/Guides/CreateGuideView.vue';
 import ScreenshotsDetailsView from '../views/Screenshots/ScreenshotsDetailsView.vue';
 
 // Vistas de videos
-import VideoView from '../views/Videos/VideoView.vue';
 import VideoDetailsView from '../views/Videos/VideoDetailsView.vue';
 
 // Vistas de perfil
 import PerfilView from '../views/Profile/PerfilView.vue';
 import EditProfileView from '../views/Profile/EditProfileView.vue';
 
-
 // Definición de rutas
 const routes = [
   { path: '/', component: HomeView, name: 'Home' },
   { path: '/login', component: LoginView, name: 'Login' },
   { path: '/register', component: RegisterView, name: 'Register' },
+  { path: '/about', component: AboutView, name: 'About' },
   { path: '/juego', component: Game, name: 'Juego' },
   { path: '/perfil', component: PerfilView, name: 'Perfil' },
   { path: '/perfil/editar', component: EditProfileView, name: 'EditProfile' },
@@ -68,7 +68,7 @@ const routes = [
   {
     path: '/videos',
     name: 'Videos',
-    component: VideoView,
+    component: CommunityView, // Changed from VideoView
   },
   {
     path: '/videos/:id',
