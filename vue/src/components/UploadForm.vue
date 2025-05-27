@@ -1,26 +1,11 @@
 <template>
-  <div class="upload-form-modal">
-    <div class="upload-form">
-      <h3>{{ type === 'screenshot' ? 'Subir Nueva Captura' : 'Subir Nuevo Video' }}</h3>
-      <form @submit.prevent="handleSubmit">
-        <div class="form-group">
-          <label :for="`${type}-title`">Título</label>
-          <input type="text" :id="`${type}-title`" v-model="item.title" :placeholder="`Título de tu ${type}...`" required />
-        </div>
-        <div class="form-group">
-          <label :for="`${type}-file`">Seleccionar {{ type === 'screenshot' ? 'Imagen' : 'Video' }}</label>
-          <input type="file" :id="`${type}-file`" :accept="type === 'screenshot' ? 'image/*' : 'video/*'" @change="handleFileChange" required />
-        </div>
-        <div v-if="type === 'video' || type === 'screenshot'" class="form-group">
-          <label :for="`${type}-description`">Descripción (Opcional)</label>
-          <textarea :id="`${type}-description`" v-model="item.description" :placeholder="`Describe tu ${type}...`"></textarea>
-        </div>
-        <div class="form-actions">
-          <button type="submit" class="submit-btn">Subir</button>
-          <button type="button" class="cancel-btn" @click="$emit('close')">Cancelar</button>
-        </div>
-        <p v-if="error" class="error-message">{{ error }}</p>
-      </form>
+  <div class="modal-overlay">
+    <div class="modal-content">
+      <h3>{{ type === 'screenshot' ? 'Subir Captura' : 'Subir Video' }}</h3>
+      <input v-model="uploadData" type="text" placeholder="URL o descripción" class="upload-input" />
+      <button @click="handleUpload" class="upload-btn">Subir</button>
+      <button @click="$emit('close')" class="close-btn">Cancelar</button>
+      <p v-if="error" class="error">{{ error }}</p>
     </div>
   </div>
 </template>
@@ -29,107 +14,93 @@
 export default {
   name: 'UploadForm',
   props: {
-    type: {
-      type: String,
-      required: true,
-    },
-    modelValue: {
-      type: Object,
-      required: true,
-    },
-    error: {
-      type: String,
-      default: '',
-    },
+    type: String,
+    modelValue: String,
+    error: String,
   },
-  emits: ['update:modelValue', 'close', 'upload'],
   computed: {
-    item: {
+    uploadData: {
       get() { return this.modelValue; },
       set(value) { this.$emit('update:modelValue', value); },
     },
   },
   methods: {
-    handleFileChange(event) {
-      const file = event.target.files[0];
-      if (this.type === 'screenshot') this.item.image = file;
-      else this.item.video = file;
-    },
-    handleSubmit() {
-      this.$emit('upload');
+    handleUpload() {
+      this.$emit('upload', this.uploadData);
     },
   },
 };
 </script>
 
 <style scoped>
-.upload-form-modal {
+.modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.8);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 1000;
+  justify-content: center;
+  z-index: 10;
 }
 
-.upload-form {
-  background: #1a1a1a;
+.modal-content {
+  background: rgba(20, 20, 20, 0.9);
   padding: 20px;
+  border: 4px solid #00ffcc;
   border-radius: 8px;
-  border: 2px solid #ffcc00;
-  width: 90%;
   max-width: 400px;
+  width: 90%;
+  text-align: center;
 }
 
-.form-group {
-  margin-bottom: 15px;
-}
-
-label {
+.upload-input {
+  width: 80%;
+  padding: 10px;
+  margin: 10px 0;
+  background-color: #1a1a1a;
+  border: 2px solid #00ffcc;
   color: #ffffff;
-  display: block;
-  margin-bottom: 5px;
 }
 
-input, textarea {
-  width: 100%;
-  padding: 8px;
-  background: #2a2a2a;
-  border: 1px solid #00ffcc;
-  color: #ffffff;
+.upload-btn, .close-btn {
+  padding: 10px 20px;
+  margin: 5px;
+  border: 2px solid #000;
   border-radius: 4px;
-}
-
-.form-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-}
-
-.submit-btn, .cancel-btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
+  font-family: 'Press Start 2P', monospace;
   cursor: pointer;
 }
 
-.submit-btn {
-  background: #00ffcc;
-  color: #1a1a1a;
+.upload-btn {
+  background-color: #ffcc00;
+  color: #000;
 }
 
-.cancel-btn {
-  background: #ff6f61;
-  color: #ffffff;
+.close-btn {
+  background-color: #ff0066;
+  color: #fff;
 }
 
-.error-message {
-  color: #ff6f61;
-  text-align: center;
+.error {
+  color: #ff0066;
   margin-top: 10px;
 }
-</style>  
+
+@media (max-width: 768px) {
+  .modal-content {
+    padding: 15px;
+  }
+
+  .upload-input {
+    width: 90%;
+    padding: 8px;
+  }
+
+  .upload-btn, .close-btn {
+    padding: 8px 15px;
+  }
+}
+</style>
