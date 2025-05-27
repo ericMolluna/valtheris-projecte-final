@@ -381,7 +381,7 @@
   margin-left: 20px;
 }
 
-/* Responsive Design for Hero, Roadmap, and Zone Carousel */
+/* Responsive Design */
 @media (max-width: 768px) {
   .hero-section {
     flex-direction: column;
