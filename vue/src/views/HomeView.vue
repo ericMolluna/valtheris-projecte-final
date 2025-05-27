@@ -10,7 +10,8 @@
         <div class="hero-content">
           <h1 class="game-title">Valtheris: El despertar del código</h1>
           <p class="game-description">
-            Sumérgete en un RPG de píxeles donde la programación y la magia colisionan. Resuelve acertijos, lucha contra enemigos y descubre los secretos de un reino donde cada línea de código puede cambiar tu destino.
+            Sumérgete en un RPG de píxeles donde la programación y la magia colisionan. Resuelve acertijos, lucha contra
+            enemigos y descubre los secretos de un reino donde cada línea de código puede cambiar tu destino.
           </p>
           <a href="https://discord.gg/valtheris" class="cta-button">Únete a la comunidad</a>
         </div>
@@ -26,13 +27,8 @@
         <p class="current-phase-text">Fase actual: Pre-Alpha</p>
         <div class="roadmap-container">
           <div class="roadmap-timeline">
-            <div
-              v-for="(phase, index) in roadmapPhases"
-              :key="index"
-              class="roadmap-orb"
-              :class="{ current: phase.current }"
-              @click="openModal(index)"
-            >
+            <div v-for="(phase, index) in roadmapPhases" :key="index" class="roadmap-orb"
+              :class="{ current: phase.current }" @click="openModal(index)">
               <span class="orb-icon">{{ phase.icon }}</span>
             </div>
           </div>
@@ -40,6 +36,7 @@
         <div class="roadmap-cta">
           <a href="https://github.com/valtheris" class="cta-button">Visita el repositorio en GitHub</a>
         </div>
+
       </section>
 
       <!-- Zone Carousel Section -->
@@ -100,9 +97,10 @@ export default {
     return {
       navItems: [
         { label: 'Inicio', route: '/' },
+        { label: 'Comunidad', route: '/comunidad' },
         { label: 'Acerca', route: '/about' },
         { label: 'Roadmap', route: '/roadmap' },
-        { label: 'Contacto', route: '/contact' }
+        { label: 'Contacto', route: '/contact' },
       ],
       roadmapPhases: [
         {
