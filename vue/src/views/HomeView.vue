@@ -278,3 +278,4 @@ export default {
 </script>
 
 <style src="@/assets/styles/HomeView.css" scoped></style>
+
