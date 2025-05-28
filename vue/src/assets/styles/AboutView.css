@@ -29,6 +29,7 @@
   text-shadow: 3px 3px #000, -2px -2px #00ffcc;
   margin-bottom: 20px;
   line-height: 1.3;
+  font-family: 'Press Start 2P', monospace;
 }
 
 .section-description {
@@ -41,6 +42,8 @@
 }
 
 .team-info,
+.work-info,
+.fun-facts,
 .contact-info {
   margin-bottom: 40px;
 }
@@ -50,6 +53,7 @@
   color: #ffcc00;
   text-shadow: 2px 2px #000;
   margin-bottom: 15px;
+  font-family: 'Press Start 2P', monospace;
 }
 
 .section-text {
@@ -61,6 +65,96 @@
   margin: 0 auto;
 }
 
+/* Creators Grid */
+.creators-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 10px;
+}
+
+.creator-card {
+  background: rgba(26, 26, 26, 0.9);
+  border: 2px solid #00ffcc;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: left;
+  transition: transform 0.2s;
+}
+
+.creator-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 255, 204, 0.3);
+}
+
+.creator-name {
+  font-size: 1.3em;
+  color: #ff0066;
+  text-shadow: 1px 1px #000;
+  margin-bottom: 5px;
+  font-family: 'Press Start 2P', monospace;
+}
+
+.creator-role {
+  font-size: 0.9em;
+  color: #ffcc00;
+  margin-bottom: 10px;
+}
+
+.creator-bio {
+  font-size: 0.85em;
+  color: #ffffff;
+  text-shadow: 1px 1px #000;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.creator-socials {
+  margin-top: 10px;
+}
+
+.social-link {
+  display: inline-block;
+  color: #00ffcc;
+  text-decoration: none;
+  margin-right: 15px;
+  font-size: 0.85em;
+  transition: color 0.3s;
+}
+
+.social-link:hover {
+  color: #ffcc00;
+}
+
+/* Fun Facts */
+.facts-list {
+  list-style: none;
+  padding: 0;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.facts-list li {
+  font-size: 0.9em;
+  color: #ffffff;
+  text-shadow: 1px 1px #000;
+  line-height: 1.8;
+  margin-bottom: 10px;
+  position: relative;
+  padding-left: 20px;
+}
+
+.facts-list li::before {
+  content: '★';
+  color: #ffcc00;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* Contact Links */
 .cta-link {
   color: #00ffcc;
   text-decoration: none;
@@ -93,6 +187,23 @@
   .section-text {
     font-size: 0.85em;
   }
+
+  .creators-grid {
+    grid-template-columns: 1fr; /* Stack creators on smaller screens */
+    gap: 20px;
+  }
+
+  .creator-card {
+    padding: 15px;
+  }
+
+  .creator-name {
+    font-size: 1.1em;
+  }
+
+  .facts-list li {
+    font-size: 0.85em;
+  }
 }
 
 @media (max-width: 480px) {
@@ -113,6 +224,31 @@
   }
 
   .section-text {
+    font-size: 0.8em;
+  }
+
+  .creator-card {
+    padding: 10px;
+  }
+
+  .creator-name {
+    font-size: 1em;
+  }
+
+  .creator-role {
+    font-size: 0.8em;
+  }
+
+  .creator-bio {
+    font-size: 0.8em;
+  }
+
+  .social-link {
+    font-size: 0.8em;
+    margin-right: 10px;
+  }
+
+  .facts-list li {
     font-size: 0.8em;
   }
 }
