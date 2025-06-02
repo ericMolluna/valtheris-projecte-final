@@ -3,27 +3,23 @@
     <!-- Navbar -->
     <NavBar />
 
+    <!-- Tabs Container -->
+    <div class="tabs-container">
+      <router-link v-for="tab in tabs" :key="tab.path" :to="tab.path" class="tab" :class="{ active: $route.path === tab.path }">
+        {{ tab.name }}
+      </router-link>
+    </div>
+
     <!-- Main Content -->
     <div class="main-content">
       <div class="content-section">
-        <div class="content-area">
-          <!-- Integrated Header -->
-          <div class="header-row">
-            <div class="title-and-create">
-              <h2 class="section-title">{{ currentTabTitle }}</h2>
-              <button v-if="isAuthenticated" @click="showUploadForm = true" class="create-button">Crear</button>
-            </div>
-            <div class="tabs-inline">
-              <router-link v-for="tab in tabs" :key="tab.path" :to="tab.path" class="tab" :class="{ active: $route.path === tab.path }">
-                {{ tab.name }}
-              </router-link>
-            </div>
-          </div>
-          <div class="action-row">
-            <div class="filter-buttons">
-              <button class="filter-btn" @click="sortBy = 'recent'">Más Recientes</button>
-              <button class="filter-btn" @click="sortBy = 'popular'">Más Populares</button>
-            </div>
+        <div v-if="$route.path === '/comunidad' || $route.path === '/comunidad/capturas' || $route.path === '/comunidad/guias' || $route.path === '/videos' || $route.path === '/retransmisiones'" class="content-area">
+          <ContentHeader :title="currentTabTitle" :showCreate="isAuthenticated" @create-click="showUploadForm = true" />
+          
+          <!-- Filter Buttons -->
+          <div class="filter-buttons" v-if="$route.path === '/comunidad/capturas' || $route.path === '/comunidad/guias' || $route.path === '/videos'">
+            <button class="filter-btn" @click="sortBy = 'recent'">Más Recientes</button>
+            <button class="filter-btn" @click="sortBy = 'popular'">Más Populares</button>
           </div>
 
           <!-- Content List -->
@@ -97,6 +93,7 @@ export default {
   components: {
     NavBar: defineAsyncComponent(() => import('@/components/NavBar.vue')),
     FooterSection: defineAsyncComponent(() => import('@/components/FooterSection.vue')),
+    ContentHeader: defineAsyncComponent(() => import('@/components/ContentHeader.vue')),
     ContentList: defineAsyncComponent(() => import('@/components/ContentList.vue')),
     UploadForm: defineAsyncComponent(() => import('@/components/UploadForm.vue')),
     ContentModal: defineAsyncComponent(() => import('@/components/ContentModal.vue')),
@@ -106,7 +103,7 @@ export default {
     return {
       isAuthenticated,
       userTier,
-      sortBy: 'recent',
+      sortBy: 'recent', // Default sorting
       ...rest,
     };
   },
@@ -121,12 +118,13 @@ export default {
       return 'Todo';
     },
     filteredContent() {
+      // Placeholder logic - adjust based on CommunityViewLogic
       let content = [];
       if (this.$route.path === '/comunidad') content = this.allContent;
       else if (this.$route.path === '/comunidad/capturas') content = this.sortedScreenshots;
       else if (this.$route.path === '/comunidad/guias') content = this.sortedGuides;
       else if (this.$route.path === '/videos') content = this.sortedVideos;
-      else if (this.$route.path === '/retransmisiones') content = [];
+      else if (this.$route.path === '/retransmisiones') content = []; // Adjust as needed
 
       return this.sortBy === 'popular' ? content.sort((a, b) => b.likes - a.likes) : content.sort((a, b) => new Date(b.date) - new Date(a.date));
     },

@@ -1,9 +1,15 @@
 <template>
-  <div class="main-container">
-    <!-- Navbar -->
-    <NavBar />
+  <div class="login-container">
+    <nav class="nav-container">
+      <div class="logo">
+        <router-link to="/" class="logo-link">🎮 GameHub</router-link>
+      </div>
+      <ul>
+        <li><router-link to="/"><i class="icon">🏠</i> Volver al Inicio</router-link></li>
+        <li><router-link to="/register"><i class="icon">✍️</i> Registrarse</router-link></li>
+      </ul>
+    </nav>
 
-    <!-- Login Content -->
     <div class="login-content">
       <h2 class="animated-title">Iniciar Sesión</h2>
       <form @submit.prevent="handleLogin" class="login-form">
@@ -27,22 +33,16 @@
       </div>
     </div>
 
-    <!-- Footer -->
-    <FooterSection />
+
   </div>
 </template>
 
 <script>
 import axios from 'axios';
-import Swal from 'sweetalert2';
-import NavBar from '@/components/NavBar.vue';
-import FooterSection from '@/components/FooterSection.vue';
+import Swal from 'sweetalert2'; 
+import '@/assets/styles/Auth/LoginView.css';
 
 export default {
-  components: {
-    NavBar,
-    FooterSection
-  },
   data() {
     return {
       email: '',
@@ -104,14 +104,14 @@ export default {
           localStorage.setItem('auth_token', response.data.token);
           this.successMessage = 'Inicio de sesión exitoso.';
           this.errorMessage = '';
-          Swal.close();
+          Swal.close(); 
           setTimeout(() => this.$router.push('/perfil'), 1000);
         }
       } catch (error) {
         console.error('Error en login:', error.response ? error.response.data : error.message);
         this.errorMessage = error.response?.data?.message || 'Error en inicio de sesión.';
         this.successMessage = '';
-        Swal.close();
+        Swal.close(); 
       }
     },
     async handleGoogleSignIn(response) {
@@ -139,7 +139,7 @@ export default {
           localStorage.setItem('auth_token', serverResponse.data.token);
           this.successMessage = 'Inicio de sesión con Google exitoso.';
           this.errorMessage = '';
-          Swal.close();
+          Swal.close(); 
           setTimeout(() => this.$router.push('/'), 1000);
         }
       } catch (error) {
@@ -152,5 +152,3 @@ export default {
   },
 };
 </script>
-
-<style src="@/assets/styles/Auth/LoginView.css" scoped></style>

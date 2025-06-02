@@ -6,8 +6,10 @@ use App\Http\Controllers\SavedGameController;
 use App\Http\Controllers\ScreenshotController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\TwitterController;
 use App\Http\Controllers\VideoController;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Ruta de prueba para verificar que la API está activa
