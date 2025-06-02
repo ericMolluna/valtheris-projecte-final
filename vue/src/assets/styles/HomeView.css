@@ -1,3 +1,5 @@
+
+
 /* Hero Section */
 .hero-section {
   display: flex;
@@ -7,15 +9,13 @@
   padding: 60px 20px;
   background: rgba(0, 0, 0, 0.7);
   color: white;
-  border-top: 4px solid #00ffcc;
-  border-bottom: 4px solid #00ffcc;
-  border-left: 4px solid #00ffcc;
-  border-right: 4px solid #00ffcc;
+  border: 4px solid #1a3c34;
   margin: 0;
   position: relative;
   z-index: 2;
   width: 100%;
   box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
 }
 
 .hero-content {
@@ -25,10 +25,11 @@
 
 .game-title {
   font-size: 2.2em;
-  color: #ff0066;
-  text-shadow: 3px 3px #000, -2px -2px #00ffcc;
+  color: #d94f70;
+  text-shadow: 3px 3px #000, -2px -2px #1a3c34;
   margin-bottom: 20px;
   line-height: 1.3;
+  font-family: 'Roboto', sans-serif; /* Added for consistent title font */
 }
 
 .game-description {
@@ -40,7 +41,7 @@
 }
 
 .cta-button {
-  background: linear-gradient(to right, #ffcc00, #ff0066);
+  background: linear-gradient(to right, #e6b800, #d94f70);
   color: #000;
   padding: 12px 24px;
   text-decoration: none;
@@ -48,8 +49,8 @@
   border-radius: 8px;
   font-size: 0.9em;
   font-weight: bold;
-  text-shadow: 1px 1px #000;
   transition: transform 0.2s, box-shadow 0.3s;
+  font-family: 'Roboto', sans-serif;
 }
 
 .cta-button:hover {
@@ -59,9 +60,9 @@
 
 .hero-image img {
   max-width: 350px;
-  border: 4px solid #00ffcc;
+  border: 4px solid #1a3c34;
   border-radius: 8px;
-  box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
+  box-shadow: 0 0 20px rgba(26, 60, 52, 0.5);
   image-rendering: pixelated;
 }
 
@@ -70,10 +71,7 @@
   padding: 60px 10px;
   background: rgba(0, 0, 0, 0.7);
   margin: 0;
-  border-top: 4px solid #ffcc00;
-  border-bottom: 4px solid #ffcc00;
-  border-left: 4px solid #ffcc00;
-  border-right: 4px solid #ffcc00;
+  border: 4px solid #1a3c34;
   position: relative;
   z-index: 2;
   width: 100%;
@@ -81,11 +79,12 @@
 }
 
 .roadmap-title {
-  font-size: 2em;
-  color: #ff0066;
-  text-shadow: 3px 3px #000, -2px -2px #00ffcc;
+  font-size: 1.8em;
+  color: #d94f70;
+  text-shadow: 3px 3px #000, -2px -2px #1a3c34;
   text-align: center;
   margin-bottom: 20px;
+  font-family: 'Roboto', sans-serif; /* Added for consistent title font */
 }
 
 .current-phase-text {
@@ -121,7 +120,7 @@
   left: 0;
   right: 0;
   height: 100%;
-  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 200" preserveAspectRatio="none"><path d="M0,100 Q166,40 333,100 Q500,160 666,100 Q833,40 1000,100" stroke="url(%23grad)" stroke-width="4" fill="none"/><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:%23ffcc00;stop-opacity:1"/><stop offset="100%" style="stop-color:%23ff0066;stop-opacity:1"/></linearGradient></defs></svg>') no-repeat center;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 200" preserveAspectRatio="none"><path d="M0,100 Q166,40 333,100 Q500,160 666,100 Q833,40 1000,100" stroke="url(%23grad)" stroke-width="4" fill="none"/><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:%23e6b800;stop-opacity:1"/><stop offset="100%" style="stop-color:%23d94f70;stop-opacity:1"/></linearGradient></defs></svg>') no-repeat center;
   background-size: 100% 100%;
   z-index: 1;
 }
@@ -142,32 +141,28 @@
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.roadmap-orb:nth-child(1) { left: 5%; top: 100px; background: #ff0066; }
-.roadmap-orb:nth-child(2) { left: 20%; top: 40px; background: #ffcc00; }
-.roadmap-orb:nth-child(3) { left: 35%; top: 100px; background: #00ffcc; }
-.roadmap-orb:nth-child(4) { left: 50%; top: 160px; background: #ff6699; }
+.roadmap-orb:nth-child(1) { left: 5%; top: 75px; background: #d94f70; }
+.roadmap-orb:nth-child(2) { left: 20%; top: 67px; background: #e6b800; }
+.roadmap-orb:nth-child(3) { left: 35%; top: 120px; background: #1a3c34; }
+.roadmap-orb:nth-child(4) { left: 50%; top: 143px; background: #d94f70; }
 .roadmap-orb:nth-child(5) { left: 65%; top: 100px; background: #66ccff; }
-.roadmap-orb:nth-child(6) { left: 80%; top: 40px; background: #66ccff; }
-.roadmap-orb:nth-child(7) { left: 95%; top: 100px; background: #ffffff; }
-
-.roadmap-orb.current {
-  box-shadow: 0 0 15px rgba(255, 0, 102, 0.8);
-  animation: glow 1.5s infinite;
-}
+.roadmap-orb:nth-child(6) { left: 80%; top: 61px; background: #66ccff; }
+.roadmap-orb:nth-child(7) { left: 95%; top: 94px; background: #ffffff; }
 
 .roadmap-orb:hover {
   transform: scale(1.1);
-  box-shadow: 0 0 10px rgba(0, 255, 204, 0.8);
+  box-shadow: 0 0 10px rgba(26, 60, 52, 0.8);
 }
 
 .orb-icon {
   color: #000;
   text-shadow: 1px 1px #fff;
+  font-family: 'Roboto', sans-serif;
 }
 
 @keyframes glow {
-  0%, 100% { box-shadow: 0 0 15px rgba(255, 0, 102, 0.8); }
-  50% { box-shadow: 0 0 25px rgba(255, 0, 102, 1); }
+  0%, 100% { box-shadow: 0 0 15px rgba(217, 79, 112, 0.8); }
+  50% { box-shadow: 0 0 25px rgba(217, 79, 112, 1); }
 }
 
 .roadmap-cta {
@@ -192,12 +187,12 @@
 .modal-content {
   background: rgba(20, 20, 20, 0.9);
   padding: 30px;
-  border: 4px solid #00ffcc;
+  border: 4px solid #1a3c34;
   border-radius: 8px;
   max-width: 600px;
   width: 90%;
   position: relative;
-  box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
+  box-shadow: 0 0 20px rgba(26, 60, 52, 0.5);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -205,12 +200,13 @@
 
 .phase-title {
   font-size: 1.4em;
-  color: #ffcc00;
+  color: #e6b800;
   text-shadow: 2px 2px #000;
   margin-bottom: 15px;
   text-align: center;
   line-height: 1.2;
   width: 100%;
+  font-family: 'Roboto', sans-serif; /* Added for consistent title font */
 }
 
 .phase-date {
@@ -244,19 +240,19 @@
   content: '🔹';
   position: absolute;
   left: 0;
-  color: #00ffcc;
+  color: #1a3c34;
 }
 
 .modal-close {
   position: absolute;
   top: 10px;
   right: 10px;
-  background: #ff0066;
+  background: #d94f70;
   color: #000;
   border: 3px solid #000;
   border-radius: 6px;
   padding: 5px 10px;
-  font-family: 'Press Start 2P', monospace;
+  font-family: 'Roboto', sans-serif;
   font-size: 0.8em;
   cursor: pointer;
   transition: transform 0.2s;
@@ -271,10 +267,7 @@
   padding: 60px 20px;
   background: rgba(0, 0, 0, 0.7);
   margin: 0;
-  border-top: 4px solid #00ffcc;
-  border-bottom: 4px solid #00ffcc;
-  border-left: 4px solid #00ffcc;
-  border-right: 4px solid #00ffcc;
+  border: 4px solid #1a3c34;
   position: relative;
   z-index: 2;
   width: 100%;
@@ -282,11 +275,12 @@
 }
 
 .zone-title {
-  font-size: 2em;
-  color: #ff0066;
-  text-shadow: 3px 3px #000, -2px -2px #00ffcc;
+  font-size: 1.8em;
+  color: #d94f70;
+  text-shadow: 3px 3px #000, -2px -2px #1a3c34;
   text-align: center;
   margin-bottom: 20px;
+  font-family: 'Roboto', sans-serif; /* Added for consistent title font */
 }
 
 .carousel-wrapper {
@@ -313,13 +307,13 @@
   flex: 0 0 calc(33.33% - 20px);
   margin: 0 10px;
   background: rgba(20, 20, 20, 0.9);
-  border: 4px solid #00ffcc;
+  border: 4px solid #1a3c34;
   border-radius: 8px;
   padding: 15px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+  box-shadow: 0 0 10px rgba(26, 60, 52, 0.3);
   box-sizing: border-box;
 }
 
@@ -327,7 +321,7 @@
   width: 100%;
   height: 200px;
   object-fit: cover;
-  border: 2px solid #ffcc00;
+  border: 2px solid #e6b800;
   border-radius: 4px;
   image-rendering: pixelated;
 }
@@ -338,10 +332,11 @@
 
 .zone-name {
   font-size: 1.2em;
-  color: #ffcc00;
+  color: #e6b800;
   text-shadow: 2px 2px #000;
   margin-bottom: 10px;
   text-align: center;
+  font-family: 'Roboto', sans-serif; /* Added for consistent title font */
 }
 
 .zone-description {
@@ -353,7 +348,7 @@
 }
 
 .carousel-arrow {
-  background: #ff0066;
+  background: #d94f70;
   color: #000;
   border: 3px solid #000;
   border-radius: 50%;
@@ -366,10 +361,11 @@
   cursor: pointer;
   transition: transform 0.2s, background 0.3s;
   z-index: 10;
+  font-family: 'Roboto', sans-serif;
 }
 
 .carousel-arrow:hover {
-  background: #ffcc00;
+  background: #e6b800;
   transform: scale(1.1);
 }
 
@@ -389,10 +385,7 @@
     padding: 40px 15px;
     margin: 0;
     width: 100%;
-    border-top: 4px solid #00ffcc;
-    border-bottom: 4px solid #00ffcc;
-    border-left: 4px solid #00ffcc;
-    border-right: 4px solid #00ffcc;
+    border: 4px solid #1a3c34;
   }
 
   .hero-content {
@@ -401,6 +394,7 @@
 
   .game-title {
     font-size: 1.8em;
+    font-family: 'Roboto', sans-serif; /* Consistent title font */
   }
 
   .game-description {
@@ -414,20 +408,20 @@
   .cta-button {
     margin: 0 auto;
     display: block;
+    font-size: 0.85em;
+    font-family: 'Roboto', sans-serif;
   }
 
   .roadmap-section {
     padding: 40px 5px;
     margin: 0;
     width: 100%;
-    border-top: 4px solid #ffcc00;
-    border-bottom: 4px solid #ffcc00;
-    border-left: 4px solid #ffcc00;
-    border-right: 4px solid #ffcc00;
+    border: 4px solid #1a3c34;
   }
 
   .roadmap-title {
     font-size: 1.6em;
+    font-family: 'Roboto', sans-serif; /* Consistent title font */
   }
 
   .current-phase-text {
@@ -453,7 +447,7 @@
     transform: translateX(-50%);
     width: 4px;
     height: 100%;
-    background: linear-gradient(to bottom, #ffcc00, #ff0066);
+    background: linear-gradient(to bottom, #e6b800, #d94f70);
     z-index: 1;
   }
 
@@ -467,10 +461,12 @@
 
   .zone-carousel-section {
     padding: 40px 10px;
+    border: 4px solid #1a3c34;
   }
 
   .zone-title {
     font-size: 1.6em;
+    font-family: 'Roboto', sans-serif; /* Consistent title font */
   }
 
   .zone-carousel-container {
@@ -488,6 +484,7 @@
 
   .zone-name {
     font-size: 1em;
+    font-family: 'Roboto', sans-serif; /* Consistent title font */
   }
 
   .zone-description {
@@ -498,6 +495,7 @@
     width: 35px;
     height: 35px;
     font-size: 1em;
+    font-family: 'Roboto', sans-serif;
   }
 
   .left-arrow {
@@ -515,6 +513,7 @@
 
   .phase-title {
     font-size: 1.2em;
+    font-family: 'Roboto', sans-serif; /* Consistent title font */
   }
 
   .phase-date {
@@ -533,6 +532,7 @@
 
   .game-title {
     font-size: 1.5em;
+    font-family: 'Roboto', sans-serif; /* Consistent title font */
   }
 
   .game-description {
@@ -542,6 +542,7 @@
   .cta-button {
     padding: 10px 18px;
     font-size: 0.8em;
+    font-family: 'Roboto', sans-serif;
   }
 
   .roadmap-section {
@@ -550,6 +551,7 @@
 
   .roadmap-title {
     font-size: 1.4em;
+    font-family: 'Roboto', sans-serif; /* Consistent title font */
   }
 
   .current-phase-text {
@@ -568,6 +570,7 @@
 
   .zone-title {
     font-size: 1.4em;
+    font-family: 'Roboto', sans-serif; /* Consistent title font */
   }
 
   .zone-card {
@@ -581,6 +584,7 @@
 
   .zone-name {
     font-size: 0.9em;
+    font-family: 'Roboto', sans-serif; /* Consistent title font */
   }
 
   .zone-description {
@@ -591,6 +595,7 @@
     width: 30px;
     height: 30px;
     font-size: 0.9em;
+    font-family: 'Roboto', sans-serif;
   }
 
   .left-arrow {
@@ -603,5 +608,6 @@
 
   .phase-title {
     font-size: 1em;
+    font-family: 'Roboto', sans-serif; /* Consistent title font */
   }
 }

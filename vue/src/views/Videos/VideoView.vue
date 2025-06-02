@@ -1,3 +1,4 @@
+
 <template>
   <div class="videos-container">
     <!-- Barra de navegación superior -->
