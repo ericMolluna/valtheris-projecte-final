@@ -1,40 +1,7 @@
 <template>
   <div class="create-guide-container">
     <!-- Barra de navegación superior -->
-    <nav class="nav-container">
-      <div class="logo">
-        <router-link to="/" class="logo-link">🎮 Valtheris</router-link>
-      </div>
-      <button class="menu-toggle" @click="toggleMenu" aria-label="Toggle Menu">
-        ☰
-      </button>
-      <ul :class="{ 'nav-links': true, 'nav-links-open': isMenuOpen }">
-        <li>
-          <router-link to="/juego" class="nav-item">
-            <span class="icon">🎮</span> Jugar
-          </router-link>
-        </li>
-      
-        <li>
-            <router-link to="/comunidad" class="nav-item">
-            <span class="icon">👥</span> Comunidad
-          </router-link>
-      
-        
-        </li>
-         <li>
-          <router-link :to="isAuthenticated ? '/perfil' : '/login'" class="nav-item">
-            <span class="icon">{{ isAuthenticated ? '👤' : '🔑' }}</span>
-            {{ isAuthenticated ? 'Perfil' : 'Login' }}
-          </router-link>
-        </li>
-        <li v-if="isAuthenticated">
-          <button class="nav-item logout-btn" @click="handleLogout" aria-label="Cerrar Sesión">
-            <span class="icon">🚪</span> Cerrar Sesión
-          </button>
-        </li>
-      </ul>
-    </nav>
+    <NavBar :menu-items="customMenuItems" @cancel-guide="cancelEdit" />
 
     <!-- Contenedor principal -->
     <div class="main-content">
@@ -173,16 +140,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="footer-section">
-      <div class="footer-content">
-        <p>© 2025 Valtheris. Todos los derechos reservados.</p>
-        <div class="social-links">
-          <a href="#" class="social-icon" aria-label="Twitter">🐦</a>
-          <a href="#" class="social-icon" aria-label="Discord">💬</a>
-          <a href="#" class="social-icon" aria-label="Instagram">📸</a>
-        </div>
-      </div>
-    </footer>
+    <FooterSection />
   </div>
 </template>
 
@@ -193,10 +151,16 @@ import { isAuthenticated } from '@/api/auth';
 import { QuillEditor } from '@vueup/vue-quill';
 import 'quill/dist/quill.snow.css';
 import DOMPurify from 'dompurify';
+import NavBar from '@/components/NavBar.vue';
+import FooterSection from '@/components/FooterSection.vue';
 
 export default {
   name: 'CreateGuideView',
-  components: { QuillEditor },
+  components: {
+    QuillEditor,
+    NavBar,
+    FooterSection,
+  },
   data() {
     return {
       isAuthenticated: localStorage.getItem('auth_token') !== null,
@@ -223,8 +187,6 @@ export default {
       successMessage: '',
       errorMessage: '',
       user: null,
-      isMenuOpen: false,
-      isDropdownOpen: false,
       isDragging: false,
       isSubmitting: false,
       quillToolbar: [
@@ -260,6 +222,42 @@ export default {
         ? DOMPurify.sanitize(this.guideForm.content)
         : 'Sin contenido';
     },
+    customMenuItems() {
+      const items = [
+        {
+          name: 'Comunidad',
+          to: '/comunidad',
+          icon: '👥',
+        },
+        {
+          name: 'Cancelar Creación Guía',
+          action: 'cancel-guide', // Emits custom event
+          icon: '❌',
+        },
+      ];
+      // Add authentication-based items
+      if (this.isAuthenticated) {
+        items.push(
+          {
+            name: 'Perfil',
+            to: '/perfil',
+            icon: '👤',
+          },
+          {
+            name: 'Cerrar Sesión',
+            action: 'logout',
+            icon: '🚪',
+          }
+        );
+      } else {
+        items.push({
+          name: 'Login',
+          to: '/login',
+          icon: '🔑',
+        });
+      }
+      return items;
+    },
   },
   created() {
     window.addEventListener('storage', this.updateAuthStatus);
@@ -274,13 +272,6 @@ export default {
     window.removeEventListener('storage', this.updateAuthStatus);
   },
   methods: {
-    toggleMenu() {
-      this.isMenuOpen = !this.isMenuOpen;
-      if (this.isMenuOpen) this.isDropdownOpen = false;
-    },
-    toggleDropdown() {
-      this.isDropdownOpen = !this.isDropdownOpen;
-    },
     async checkAuthStatus() {
       this.isAuthenticated = await isAuthenticated();
       if (!this.isAuthenticated) {
@@ -288,7 +279,7 @@ export default {
           icon: 'warning',
           title: 'Inicia sesión',
           text: 'Debes iniciar sesión para crear o editar guías.',
-          confirmButtonColor: '#ff0066',
+          confirmButtonColor: '#3b82f6',
         });
         this.$router.push('/login');
       }
@@ -312,7 +303,7 @@ export default {
           icon: 'error',
           title: 'Error',
           text: this.errorMessage,
-          confirmButtonColor: '#ff0066',
+          confirmButtonColor: '#3b82f6',
         });
       }
     },
@@ -339,7 +330,7 @@ export default {
           icon: 'error',
           title: 'Error',
           text: this.errorMessage,
-          confirmButtonColor: '#ff0066',
+          confirmButtonColor: '#3b82f6',
         });
       }
     },
@@ -375,7 +366,7 @@ export default {
           icon: 'error',
           title: 'Error',
           text: this.imageError,
-          confirmButtonColor: '#ff0066',
+          confirmButtonColor: '#3b82f6',
         });
         this.$refs.fileInput.value = '';
         return;
@@ -388,7 +379,7 @@ export default {
           icon: 'error',
           title: 'Error',
           text: this.imageError,
-          confirmButtonColor: '#ff0066',
+          confirmButtonColor: '#3b82f6',
         });
         this.$refs.fileInput.value = '';
         return;
@@ -404,7 +395,7 @@ export default {
             icon: 'error',
             title: 'Error',
             text: this.imageError,
-            confirmButtonColor: '#ff0066',
+            confirmButtonColor: '#3b82f6',
           });
           this.$refs.fileInput.value = '';
           return;
@@ -423,7 +414,7 @@ export default {
           icon: 'error',
           title: 'Error',
           text: this.imageError,
-          confirmButtonColor: '#ff0066',
+          confirmButtonColor: '#3b82f6',
         });
         this.$refs.fileInput.value = '';
       };
@@ -499,7 +490,7 @@ export default {
           icon: 'warning',
           title: 'Campos requeridos',
           html: `Completa los siguientes campos en "Información básica":<br><strong>${missingFields.join(', ')}</strong>`,
-          confirmButtonColor: '#ff0066',
+          confirmButtonColor: '#3b82f6',
         });
         return;
       }
@@ -511,7 +502,7 @@ export default {
           icon: 'warning',
           title: 'Campos requeridos',
           text: 'Por favor, completa todos los campos obligatorios.',
-          confirmButtonColor: '#ff0066',
+          confirmButtonColor: '#3b82f6',
         });
         return;
       }
@@ -568,7 +559,7 @@ export default {
           icon: 'error',
           title: 'Error',
           text: this.errorMessage,
-          confirmButtonColor: '#ff0066',
+          confirmButtonColor: '#3b82f6',
         });
       } finally {
         this.isSubmitting = false;
@@ -580,8 +571,8 @@ export default {
         text: 'Perderás los cambios no guardados.',
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#ff0066',
-        cancelButtonColor: '#2a2a3f',
+        confirmButtonColor: '#3b82f6',
+        cancelButtonColor: '#64748b',
         confirmButtonText: 'Sí, cancelar',
         cancelButtonText: 'No, continuar',
       }).then((result) => {
@@ -617,7 +608,7 @@ export default {
           icon: 'error',
           title: 'Error',
           text: 'No se pudo cerrar la sesión.',
-          confirmButtonColor: '#ff0066',
+          confirmButtonColor: '#3b82f6',
         });
       }
     },

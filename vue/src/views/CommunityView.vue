@@ -14,7 +14,11 @@
     <div class="main-content">
       <div class="content-section">
         <div v-if="$route.path === '/comunidad' || $route.path === '/comunidad/capturas' || $route.path === '/comunidad/guias' || $route.path === '/videos' || $route.path === '/retransmisiones'" class="content-area">
-          <ContentHeader :title="currentTabTitle" :showCreate="isAuthenticated" @create-click="showUploadForm = true" />
+          <ContentHeader 
+            :title="currentTabTitle" 
+            :showCreate="isAuthenticated" 
+            @create-click="handleCreateClick" 
+          />
           
           <!-- Filter Buttons -->
           <div class="filter-buttons" v-if="$route.path === '/comunidad/capturas' || $route.path === '/comunidad/guias' || $route.path === '/videos'">
@@ -118,15 +122,15 @@ export default {
       return 'Todo';
     },
     filteredContent() {
-      // Placeholder logic - adjust based on CommunityViewLogic
       let content = [];
       if (this.$route.path === '/comunidad') content = this.allContent;
       else if (this.$route.path === '/comunidad/capturas') content = this.sortedScreenshots;
       else if (this.$route.path === '/comunidad/guias') content = this.sortedGuides;
       else if (this.$route.path === '/videos') content = this.sortedVideos;
       else if (this.$route.path === '/retransmisiones') content = []; // Adjust as needed
-
-      return this.sortBy === 'popular' ? content.sort((a, b) => b.likes - a.likes) : content.sort((a, b) => new Date(b.date) - new Date(a.date));
+      return this.sortBy === 'popular' 
+        ? content.sort((a, b) => b.likes - a.likes) 
+        : content.sort((a, b) => new Date(b.date) - new Date(a.date));
     },
     loadingContent() {
       if (this.$route.path === '/comunidad') return this.loadingAllContent;
@@ -145,9 +149,25 @@ export default {
   },
   methods: {
     handleContentClick(item) {
-      if (this.$route.path === '/comunidad/capturas') this.openScreenshotModal(item);
-      else if (this.$route.path === '/comunidad/guias') this.viewGuide(item);
-      else if (this.$route.path === '/videos') this.openVideoModal(item);
+      if (this.$route.path === '/comunidad/capturas') {
+        this.openScreenshotModal(item);
+      } else if (this.$route.path === '/comunidad/guias') {
+        this.viewGuide(item);
+      } else if (this.$route.path === '/videos') {
+        this.openVideoModal(item);
+      }
+    },
+    handleCreateClick() {
+      if (this.$route.path === '/comunidad/guias') {
+        // Navigate to CreateGuide view
+        this.$router.push({ name: 'CreateGuide' });
+      } else if (this.$route.path === '/comunidad/capturas') {
+        // Show screenshot upload form
+        this.showUploadForm = true;
+      } else if (this.$route.path === '/videos') {
+        // Show video upload form
+        this.showVideoUploadForm = true;
+      }
     },
   },
 };
