@@ -1,17 +1,9 @@
 <template>
-  <div class="register-container">
-    <nav class="nav-container">
-      <div class="logo">
-        <router-link to="/" class="logo-link">🎮 GameHub</router-link>
-      </div>
-      <ul>
-        <li><router-link to="/"><i class="icon">🏠</i> Volver al Inicio</router-link></li>
-        <li><router-link to="/login"><i class="icon">🔑</i> Iniciar Sesión</router-link></li>
-      </ul>
-    </nav>
-
-    <div class="register-content">
-      <h2 class="animated-title">Registro</h2>
+  <div>
+    <NavBar />
+    
+    <div class="register-container">
+      <h2 class="register-title">Registro</h2>
       <form @submit.prevent="handleRegister" class="register-form">
         <div class="form-group">
           <label for="name">Nombre:</label>
@@ -25,24 +17,29 @@
           <label for="password">Contraseña:</label>
           <input type="password" id="password" v-model="password" autocomplete="new-password" required />
         </div>
-        <button type="submit">Registrarse</button>
+        <button type="submit" class="cta-button">Registrarse</button>
         <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
       </form>
     </div>
-   
+    
+    <FooterSection />
   </div>
 </template>
 
 <script>
 import axios from 'axios';
-import '@/assets/styles/Auth/RegisterView.css'; 
-
+import NavBar from '@/components/NavBar.vue';
+import FooterSection from '@/components/FooterSection.vue';
 
 export default {
+  components: {
+    NavBar,
+    FooterSection,
+  },
   async created() {
     try {
-      await axios.get('http://localhost:8000/api/sanctum/csrf-cookie');
+      await axios.get('http://localhost:8000/sanctum/csrf-cookie');
       console.log('Token CSRF inicializado correctamente');
     } catch (error) {
       console.error('Error al obtener el token CSRF:', error);
@@ -60,7 +57,6 @@ export default {
   methods: {
     async handleRegister() {
       try {
-        console.log('Enviando datos al registro:', { name: this.name, email: this.email, password: this.password });
         const response = await axios.post('http://localhost:8000/api/register', {
           name: this.name,
           email: this.email,
@@ -68,20 +64,20 @@ export default {
         }, {
           withCredentials: true,
         });
-        console.log('Respuesta del servidor:', response.data);
-        if (response.data && response.data.message) {
+        if (response.data?.message) {
           this.successMessage = 'Registro exitoso. Ahora puedes iniciar sesión.';
           this.errorMessage = '';
-          setTimeout(() => {
-            this.$router.push('/login');
-          }, 2000);
+          setTimeout(() => this.$router.push('/login'), 2000);
         }
       } catch (error) {
-        console.error('Error en registro:', error.response ? error.response.data : error.message);
-        this.errorMessage = error.response?.data?.message || 'Error en registro: No se pudo conectar con el servidor.';
+        this.errorMessage = error.response?.data?.message || 'Error al registrar.';
         this.successMessage = '';
       }
     },
   },
 };
 </script>
+
+<style scoped>
+@import '@/assets/styles/Auth/RegisterView.css';
+</style>
