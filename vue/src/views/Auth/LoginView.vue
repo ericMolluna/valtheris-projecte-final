@@ -1,17 +1,8 @@
 <template>
-  <div class="login-container">
-    <nav class="nav-container">
-      <div class="logo">
-        <router-link to="/" class="logo-link">🎮 GameHub</router-link>
-      </div>
-      <ul>
-        <li><router-link to="/"><i class="icon">🏠</i> Volver al Inicio</router-link></li>
-        <li><router-link to="/register"><i class="icon">✍️</i> Registrarse</router-link></li>
-      </ul>
-    </nav>
-
-    <div class="login-content">
-      <h2 class="animated-title">Iniciar Sesión</h2>
+  <div>
+    <NavBar />
+    <div class="login-container">
+      <h2 class="login-title">Iniciar Sesión</h2>
       <form @submit.prevent="handleLogin" class="login-form">
         <div class="form-group">
           <label for="email">Email:</label>
@@ -21,28 +12,28 @@
           <label for="password">Contraseña:</label>
           <input type="password" id="password" v-model="password" autocomplete="current-password" required />
         </div>
-        <button type="submit">Iniciar Sesión</button>
+        <button type="submit" class="cta-button">Iniciar Sesión</button>
         <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
       </form>
-      <div id="g_id_onload" :data-client_id="googleClientId" data-callback="handleGoogleSignIn"
-        data-auto_prompt="false">
-      </div>
-      <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="sign_in_with"
-        data-shape="rectangular" data-logo_alignment="left">
-      </div>
+      <div id="g_id_onload" :data-client_id="googleClientId" data-callback="handleGoogleSignIn" data-auto_prompt="false"></div>
+      <div class="g_id_signin" data-type="standard" data-size="large" data-theme="filled_black" data-text="continue_with" data-shape="pill" data-logo_alignment="left"></div>
     </div>
-
-
+    <FooterSection />
   </div>
 </template>
 
 <script>
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import '@/assets/styles/Auth/LoginView.css';
+import NavBar from '@/components/NavBar.vue';
+import FooterSection from '@/components/FooterSection.vue';
 
 export default {
+  components: {
+    NavBar,
+    FooterSection,
+  },
   data() {
     return {
       email: '',
@@ -121,7 +112,11 @@ export default {
         Swal.close();
       }
     },
-    // ... other methods (e.g., handleLogin) remain unchanged
   },
 };
 </script>
+
+<style scoped>
+/* Import the external CSS file */
+@import '@/assets/styles/Auth/LoginView.css';
+</style>
