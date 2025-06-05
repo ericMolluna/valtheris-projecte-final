@@ -6,8 +6,10 @@ use App\Http\Controllers\SavedGameController;
 use App\Http\Controllers\ScreenshotController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\TwitterController;
 use App\Http\Controllers\VideoController;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Ruta de prueba para verificar que la API está activa
@@ -19,6 +21,9 @@ Route::get('/test-api-enabled', function () {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/google-login', [AuthController::class, 'handleGoogleLogin']);
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
 Route::get('/guides/all', [GuideController::class, 'all']);
 Route::get('/guides/{id}', [GuideController::class, 'show']);
 Route::get('/videos', [VideoController::class, 'index']); // Public route for listing videos

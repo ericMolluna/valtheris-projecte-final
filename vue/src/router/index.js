@@ -86,6 +86,8 @@ const routes = [
     name: 'NotFound',
     component: NotFound,
   },
+
+  
 ];
 
 // Crear el enrutador

@@ -387,19 +387,19 @@ export default function CommunityViewLogic() {
           'Content-Type': 'multipart/form-data',
         },
       });
-      state.showVideoUploadForm = false;
+      state.showVideoComments = false;
       state.newVideo = { title: '', video: null, description: '' };
-      state.videoUploadError = '';
+      state.videoComments.state = '';
       await fetchVideos();
       await Swal.fire({
         title: '¡Video subido!',
         text: 'Tu video ha sido subido exitosamente.',
         icon: 'success',
-        timer: 2000,
+        timer: 1500,
         showConfirmButton: false,
       });
     } catch (error) {
-      let errorMessage = 'Error al subir el video.';
+      let errorMessage = 'Error al cargar el video.';
       if (error.response) {
         errorMessage = error.response.data.message || `Error del servidor: ${error.response.status}`;
       } else if (error.request) {
@@ -744,7 +744,7 @@ export default function CommunityViewLogic() {
   }
 
   function viewGuide(guide) {
-    router.push(`/comunidad/guias/${guide.id}`);
+    router.push(`/comunidad/guia/${guide.id}`);
   }
 
   function handleContentClick(item) {

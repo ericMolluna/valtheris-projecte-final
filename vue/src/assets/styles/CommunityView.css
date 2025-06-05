@@ -1,79 +1,21 @@
-.main-content {
-  flex: 1;
-  padding: 0;
+.tabs-container {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+  background-color: rgba(0, 0, 0, 0.7);
   position: relative;
   z-index: 2;
-  width: 100%;
-  min-height: calc(100vh - 60px - 60px);
-  display: flex;
-  flex-direction: column;
-  border-right: 2px solid #00ffcc !important; /* Ensure border is visible */
-  box-sizing: border-box; /* Prevent border from affecting layout */
-}
-
-.content-section {
-  width: 100%;
-  flex: 1;
-  padding: 20px;
-  background-color: rgba(20, 20, 20, 0.9);
-  border: 4px solid #00ffcc !important; /* Ensure border is visible */
-  border-radius: 0;
-  box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-.content-area {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-.title-and-create {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.section-title {
-  font-size: 2em;
-  color: #ff0066;
-  text-shadow: 2px 2px #000, -1px -1px #00ffcc;
-  text-align: left;
-  margin: 0;
-  text-transform: uppercase;
-  font-family: 'Press Start 2P', monospace;
-}
-
-.tabs-inline {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  padding: 0 20px; /* Increased padding to move tabs inward */
-  max-width: 40%; /* Further reduced width to fit */
 }
 
 .tab {
-  padding: 4px 6px; /* Reduced padding to make buttons smaller */
-  margin: 0 1px;
+  padding: 10px 20px;
+  margin: 0 5px;
   text-decoration: none;
-  border: 2px solid #ffcc00;
+  border: 2px solid #00ffcc;
   border-radius: 4px;
   color: #00ffcc;
-  background-color: #1a1a1a;
+  background-color: rgba(26, 26, 26, 0.9);
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.8em; /* Reduced font size */
   text-transform: uppercase;
   text-shadow: 1px 1px #000;
   transition: transform 0.2s, background-color 0.3s;
@@ -84,51 +26,58 @@
   transform: translateY(-2px);
   background-color: #ffcc00;
   color: #1a1a1a;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 8px rgba(0, 255, 204, 0.5);
 }
 
-.action-row {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
+.main-content {
+  flex: 1;
+  padding: 0; /* Remove padding to fill screen */
+  position: relative;
+  z-index: 2;
+  width: 100%; /* Ensure full width */
+  height: calc(100vh - 60px - 60px); /* Adjust for navbar and footer height */
+}
+
+.content-section {
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  padding: 20px;
+  background-color: rgba(20, 20, 20, 0.9);
+  border: 4px solid #00ffcc;
+  border-radius: 0; /* Remove rounded corners for full screen */
+  box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+}
+
+.content-area {
   width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content-header {
+  font-size: 2em;
+  color: #ff0066;
+  text-shadow: 2px 2px #000, -1px -1px #00ffcc;
+  text-align: center;
   margin-bottom: 20px;
-  padding: 0 20px; /* Increased padding to move filter buttons inward */
-}
-
-.create-button {
-  display: inline-block;
-  padding: 10px 20px;
-  background: linear-gradient(to right, #ffcc00, #ff0066);
-  color: #000;
-  border: 2px solid #000;
-  border-radius: 6px;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.9em;
-  text-shadow: 1px 1px #fff;
-  transition: transform 0.2s, box-shadow 0.3s;
-  cursor: pointer;
-}
-
-.create-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
+  text-transform: uppercase;
 }
 
 .filter-buttons {
   display: flex;
-  align-items: center;
-  max-width: 40%; /* Further reduced width to fit */
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
 .filter-btn {
-  padding: 8px 15px; /* Reduced padding to make buttons smaller */
-  margin: 0 3px; /* Reduced margin */
+  padding: 10px 20px;
+  margin: 0 10px;
   background-color: #1a1a1a;
   border: 2px solid #ffcc00;
   color: #ffcc00;
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.8em; /* Reduced font size */
   text-transform: uppercase;
   cursor: pointer;
   transition: transform 0.2s, background-color 0.3s;
@@ -156,48 +105,34 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .tabs-container {
+    padding: 5px 0;
+    flex-wrap: wrap;
+  }
+
+  .tab {
+    padding: 8px 15px;
+    margin: 0 2px 5px;
+    font-size: 0.9em;
+  }
+
   .content-section {
     padding: 15px;
     border-width: 2px;
   }
 
-  .header-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .title-and-create {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .section-title {
+  .content-header {
     font-size: 1.5em;
   }
 
-  .tabs-inline {
-    justify-content: center;
-    margin-top: 10px;
-    max-width: 100%;
-    padding: 0 10px;
-  }
-
-  .action-row {
-    flex-direction: column;
-    align-items: flex-end;
-    padding: 0 10px;
-  }
-
   .filter-buttons {
-    justify-content: flex-end;
-    max-width: 100%;
+    flex-direction: column;
+    align-items: center;
   }
 
   .filter-btn {
-    margin: 3px;
-    padding: 6px 10px;
-    font-size: 0.7em;
+    margin: 5px 0;
+    padding: 8px 15px;
   }
 
   .no-content-message {
@@ -208,23 +143,22 @@
 }
 
 @media (max-width: 480px) {
-  .section-title {
+  .tab {
+    padding: 6px 10px;
+    font-size: 0.8em;
+  }
+
+  .content-section {
+    padding: 10px;
+  }
+
+  .content-header {
     font-size: 1.2em;
   }
 
-  .tab {
-    padding: 3px 5px;
-    font-size: 0.7em;
-  }
-
-  .create-button {
+  .filter-btn {
     padding: 6px 12px;
     font-size: 0.7em;
-  }
-
-  .filter-btn {
-    padding: 5px 8px;
-    font-size: 0.6em;
   }
 
   .no-content-message {

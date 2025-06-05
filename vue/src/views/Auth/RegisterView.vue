@@ -1,9 +1,15 @@
 <template>
-  <div class="main-container">
-    <!-- Navbar -->
-    <NavBar />
+  <div class="register-container">
+    <nav class="nav-container">
+      <div class="logo">
+        <router-link to="/" class="logo-link">🎮 GameHub</router-link>
+      </div>
+      <ul>
+        <li><router-link to="/"><i class="icon">🏠</i> Volver al Inicio</router-link></li>
+        <li><router-link to="/login"><i class="icon">🔑</i> Iniciar Sesión</router-link></li>
+      </ul>
+    </nav>
 
-    <!-- Register Content -->
     <div class="register-content">
       <h2 class="animated-title">Registro</h2>
       <form @submit.prevent="handleRegister" class="register-form">
@@ -24,22 +30,16 @@
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
       </form>
     </div>
-
-    <!-- Footer -->
-    <FooterSection />
+   
   </div>
 </template>
 
 <script>
 import axios from 'axios';
-import NavBar from '@/components/NavBar.vue';
-import FooterSection from '@/components/FooterSection.vue';
+import '@/assets/styles/Auth/RegisterView.css'; 
+
 
 export default {
-  components: {
-    NavBar,
-    FooterSection
-  },
   async created() {
     try {
       await axios.get('http://localhost:8000/api/sanctum/csrf-cookie');
@@ -85,5 +85,3 @@ export default {
   },
 };
 </script>
-
-<style src="@/assets/styles/Auth/RegisterView.css" scoped></style>
