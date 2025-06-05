@@ -20,7 +20,10 @@ Route::get('/test-api-enabled', function () {
 // Rutas públicas
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/google-login', [AuthController::class, 'handleGoogleLogin']);
+Route::post('/google-login', [AuthController::class, 'googleLogin']);
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
 Route::get('/guides/all', [GuideController::class, 'all']);
 Route::get('/guides/{id}', [GuideController::class, 'show']);
 Route::get('/videos', [VideoController::class, 'index']); // Public route for listing videos

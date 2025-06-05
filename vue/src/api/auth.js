@@ -2,36 +2,39 @@ import axios from 'axios';
 
 export async function initializeCsrfToken() {
   try {
-    await axios.get('http://localhost:8000/api/sanctum/csrf-cookie');
+    await axios.get('http://localhost:8000/sanctum/csrf-cookie');
   } catch (error) {
     console.error('Error al obtener el token CSRF:', error);
     throw error;
   }
 }
 
-export function login(email, password) {
-  // Simulación de login (reemplazar con llamada a tu API)
-  return new Promise((resolve, reject) => {
-    if (email === 'root@example' && password === 'root') {
-      const token = 'fake-jwt-token';
-      resolve({ token });
-    } else {
-      reject({ message: 'Credenciales incorrectas' });
-    }
-  });
+export async function login(email, password) {
+  try {
+    await initializeCsrfToken();
+    const response = await axios.post('http://localhost:8000/api/login', {
+      email,
+      password,
+    });
+    const token = response.data.token;
+    localStorage.setItem('auth_token', token);
+    window.dispatchEvent(new Event('authChange'));
+    return response.data;
+  } catch (error) {
+    console.error('Error en el login:', error.response ? error.response.data : error.message);
+    throw error;
+  }
 }
 
 export function isAuthenticated() {
-  const token = localStorage.getItem('auth_token');
-  return !!token; // Devuelve true si hay token
+  return !!localStorage.getItem('auth_token');
 }
 
 export function logout() {
   localStorage.removeItem('auth_token');
-  window.dispatchEvent(new Event('authChange')); // Notifica a toda la app
+  window.dispatchEvent(new Event('authChange'));
 }
 
-// Función para obtener datos del usuario autenticado
 export async function getUser() {
   try {
     const response = await axios.get('http://localhost:8000/api/user', {

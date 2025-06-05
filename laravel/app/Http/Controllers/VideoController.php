@@ -11,143 +11,143 @@ use Illuminate\Support\Facades\Log;
 
 class VideoController extends Controller
 {
-  public function store(Request $request)
-{
-    try {
+    public function store(Request $request)
+    {
+        try {
 
-        $thumbnailPath = null;
-if ($request->hasFile('thumbnail')) {
-    $thumbnailFile = $request->file('thumbnail');
-    $thumbnailName = time() . '_' . $thumbnailFile->getClientOriginalName();
-    $thumbnailPath = $thumbnailFile->storeAs('thumbnails', $thumbnailName, 'public');
-    Log::info('Thumbnail almacenado en: storage/app/public/' . $thumbnailPath);
-}
-        Log::info('Authorization header', ['header' => $request->header('Authorization')]);
-        Log::info('Auth check', ['user' => auth()->user(), 'check' => auth()->check()]);
+            $thumbnailPath = null;
+            if ($request->hasFile('thumbnail')) {
+                $thumbnailFile = $request->file('thumbnail');
+                $thumbnailName = time() . '_' . $thumbnailFile->getClientOriginalName();
+                $thumbnailPath = $thumbnailFile->storeAs('thumbnails', $thumbnailName, 'public');
+                Log::info('Thumbnail almacenado en: storage/app/public/' . $thumbnailPath);
+            }
+            Log::info('Authorization header', ['header' => $request->header('Authorization')]);
+            Log::info('Auth check', ['user' => auth()->user(), 'check' => auth()->check()]);
 
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'video' => 'required|file|mimes:mp4,mov,avi|max:10240',
-            'description' => 'nullable|string',
-            'thumbnail' => 'nullable|file|mimes:jpeg,png,jpg|max:2048', // Thumbnail validation
-        ]);
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'video' => 'required|file|mimes:mp4,mov,avi|max:10240',
+                'description' => 'nullable|string',
+                'thumbnail' => 'nullable|file|mimes:jpeg,png,jpg|max:2048', // Thumbnail validation
+            ]);
 
-        if (!auth()->check()) {
-            return response()->json(['message' => 'Unauthorized'], 401);
-        }
-
-        // Log video file details
-        Log::info('Video upload attempt', [
-            'video_mime' => $request->file('video') ? $request->file('video')->getMimeType() : 'No file',
-            'video_size' => $request->file('video') ? $request->file('video')->getSize() / 1024 : 'No file',
-            'video_extension' => $request->file('video') ? $request->file('video')->getClientOriginalExtension() : 'No file',
-            'thumbnail_mime' => $request->file('thumbnail') ? $request->file('thumbnail')->getMimeType() : 'No file',
-            'thumbnail_size' => $request->file('thumbnail') ? $request->file('thumbnail')->getSize() / 1024 : 'No file',
-        ]);
-
-        // Store the video
-        $videoFile = $request->file('video');
-        $videoName = time() . '_' . $videoFile->getClientOriginalName();
-        $videoPath = $videoFile->storeAs('videos', $videoName, 'public');
-        Log::info('Video almacenado en: storage/app/public/' . $videoPath);
-
-        // Store the thumbnail (if provided)
-        $thumbnailPath = null;
-        if ($request->hasFile('thumbnail')) {
-            $thumbnailFile = $request->file('thumbnail');
-            $thumbnailName = time() . '_' . $thumbnailFile->getClientOriginalName();
-            $thumbnailPath = $thumbnailFile->storeAs('thumbnails', $thumbnailName, 'public');
-            Log::info('Thumbnail almacenado en: storage/app/public/' . $thumbnailPath);
-        }
-
-        // Create the video record
-        $video = Video::create([
-            'user_id' => auth()->id(),
-            'title' => $validated['title'],
-            'video_url' => $videoPath,
-            'thumbnail_url' => $thumbnailPath, // Store thumbnail path or null
-            'description' => $validated['description'],
-        ]);
-
-        return response()->json([
-            'id' => $video->id,
-            'user_id' => $video->user_id,
-            'username' => auth()->user()->name,
-            'title' => $video->title,
-            'video_url' => Storage::url($videoPath), // /storage/videos/filename.mp4
-            'thumbnail_url' => $thumbnailPath ? Storage::url($thumbnailPath) : null, // /storage/thumbnails/filename.jpg or null
-            'description' => $video->description,
-            'popularity' => 0,
-            'likes' => 0,
-            'dislikes' => 0,
-            'created_at' => $video->created_at,
-        ], 201);
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        Log::info('Validation failed', [
-            'errors' => $e->errors(),
-            'video_mime' => $request->file('video') ? $request->file('video')->getMimeType() : 'No file',
-            'video_size' => $request->file('video') ? $request->file('video')->getSize() / 1024 : 'No file',
-            'video_extension' => $request->file('video') ? $request->file('video')->getClientOriginalExtension() : 'No file',
-            'thumbnail_mime' => $request->file('thumbnail') ? $request->file('thumbnail')->getMimeType() : 'No file',
-            'thumbnail_size' => $request->file('thumbnail') ? $request->file('thumbnail')->getSize() / 1024 : 'No file',
-        ]);
-        return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], 422);
-    } catch (\Exception $e) {
-        Log::error('Video upload error: ' . $e->getMessage() . "\nStack trace: " . $e->getTraceAsString());
-        return response()->json(['message' => 'Error uploading video: ' . $e->getMessage()], 500);
-    }
-}
-
-    public function index(Request $request)
-{
-    try {
-        $query = Video::with('user');
-
-        if ($request->query('user') === 'me') {
-            $user = Auth::user();
-            if (!$user) {
+            if (!auth()->check()) {
                 return response()->json(['message' => 'Unauthorized'], 401);
             }
-            $query->where('user_id', $user->id);
-        }
 
-        if ($request->has('sort')) {
-            $sort = $request->input('sort');
-            if ($sort === 'popular') {
-                $query->orderByDesc('popularity');
-            } elseif ($sort === 'recent') {
-                $query->latest();
+            // Log video file details
+            Log::info('Video upload attempt', [
+                'video_mime' => $request->file('video') ? $request->file('video')->getMimeType() : 'No file',
+                'video_size' => $request->file('video') ? $request->file('video')->getSize() / 1024 : 'No file',
+                'video_extension' => $request->file('video') ? $request->file('video')->getClientOriginalExtension() : 'No file',
+                'thumbnail_mime' => $request->file('thumbnail') ? $request->file('thumbnail')->getMimeType() : 'No file',
+                'thumbnail_size' => $request->file('thumbnail') ? $request->file('thumbnail')->getSize() / 1024 : 'No file',
+            ]);
+
+            // Store the video
+            $videoFile = $request->file('video');
+            $videoName = time() . '_' . $videoFile->getClientOriginalName();
+            $videoPath = $videoFile->storeAs('videos', $videoName, 'public');
+            Log::info('Video almacenado en: storage/app/public/' . $videoPath);
+
+            // Store the thumbnail (if provided)
+            $thumbnailPath = null;
+            if ($request->hasFile('thumbnail')) {
+                $thumbnailFile = $request->file('thumbnail');
+                $thumbnailName = time() . '_' . $thumbnailFile->getClientOriginalName();
+                $thumbnailPath = $thumbnailFile->storeAs('thumbnails', $thumbnailName, 'public');
+                Log::info('Thumbnail almacenado en: storage/app/public/' . $thumbnailPath);
             }
-        } else {
-            $query->latest();
-        }
 
-        $videos = $query->get();
-        Log::info('Raw videos data:', $videos->toArray()); // Log raw data
+            // Create the video record
+            $video = Video::create([
+                'user_id' => auth()->id(),
+                'title' => $validated['title'],
+                'video_url' => $videoPath,
+                'thumbnail_url' => $thumbnailPath, // Store thumbnail path or null
+                'description' => $validated['description'],
+            ]);
 
-        $videos = $videos->map(function ($video) {
-            return [
+            return response()->json([
                 'id' => $video->id,
                 'user_id' => $video->user_id,
-                'username' => $video->user->name,
+                'username' => auth()->user()->name,
                 'title' => $video->title,
+                'video_url' => Storage::url($videoPath), // /storage/videos/filename.mp4
+                'thumbnail_url' => $thumbnailPath ? Storage::url($thumbnailPath) : null, // /storage/thumbnails/filename.jpg or null
                 'description' => $video->description,
-                'video_url' => Storage::url($video->video_url),
-                'thumbnail_url' => $video->thumbnail_url ? Storage::url($video->thumbnail_url) : null,
-                'popularity' => $video->popularity,
-                'likes' => $video->likes()->count(),
-                'dislikes' => $video->dislikes()->count(),
+                'popularity' => 0,
+                'likes' => 0,
+                'dislikes' => 0,
                 'created_at' => $video->created_at,
-                'updated_at' => $video->updated_at,
-            ];
-        });
-
-        return response()->json($videos, 200);
-    } catch (\Exception $e) {
-        Log::error('Error fetching videos: ' . $e->getMessage());
-        return response()->json(['message' => 'Error fetching videos'], 500);
+            ], 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::info('Validation failed', [
+                'errors' => $e->errors(),
+                'video_mime' => $request->file('video') ? $request->file('video')->getMimeType() : 'No file',
+                'video_size' => $request->file('video') ? $request->file('video')->getSize() / 1024 : 'No file',
+                'video_extension' => $request->file('video') ? $request->file('video')->getClientOriginalExtension() : 'No file',
+                'thumbnail_mime' => $request->file('thumbnail') ? $request->file('thumbnail')->getMimeType() : 'No file',
+                'thumbnail_size' => $request->file('thumbnail') ? $request->file('thumbnail')->getSize() / 1024 : 'No file',
+            ]);
+            return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            Log::error('Video upload error: ' . $e->getMessage() . "\nStack trace: " . $e->getTraceAsString());
+            return response()->json(['message' => 'Error uploading video: ' . $e->getMessage()], 500);
+        }
     }
-}
+
+    public function index(Request $request)
+    {
+        try {
+            $query = Video::with('user');
+
+            if ($request->query('user') === 'me') {
+                $user = Auth::user();
+                if (!$user) {
+                    return response()->json(['message' => 'Unauthorized'], 401);
+                }
+                $query->where('user_id', $user->id);
+            }
+
+            if ($request->has('sort')) {
+                $sort = $request->input('sort');
+                if ($sort === 'popular') {
+                    $query->orderByDesc('popularity');
+                } elseif ($sort === 'recent') {
+                    $query->latest();
+                }
+            } else {
+                $query->latest();
+            }
+
+            $videos = $query->get();
+            Log::info('Raw videos data:', $videos->toArray()); // Log raw data
+
+            $videos = $videos->map(function ($video) {
+                return [
+                    'id' => $video->id,
+                    'user_id' => $video->user_id,
+                    'username' => $video->user->name,
+                    'title' => $video->title,
+                    'description' => $video->description,
+                    'video_url' => Storage::url($video->video_url),
+                    'thumbnail_url' => $video->thumbnail_url ? Storage::url($video->thumbnail_url) : null,
+                    'popularity' => $video->popularity,
+                    'likes' => $video->likes()->count(),
+                    'dislikes' => $video->dislikes()->count(),
+                    'created_at' => $video->created_at,
+                    'updated_at' => $video->updated_at,
+                ];
+            });
+
+            return response()->json($videos, 200);
+        } catch (\Exception $e) {
+            Log::error('Error fetching videos: ' . $e->getMessage());
+            return response()->json(['message' => 'Error fetching videos'], 500);
+        }
+    }
     public function show($id)
     {
         try {
