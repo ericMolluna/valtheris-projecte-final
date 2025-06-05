@@ -125,42 +125,56 @@
             </div>
           </div>
 
-          <!-- Sección de Suscripción -->
           <div class="subscription-section" v-if="activeTab === 'subscription'">
             <h2>Gestión de Suscripción</h2>
-            <p>Tu suscripción actual: <span :class="tierBadgeClass">{{ userTier }}</span></p>
             <div class="tier-options">
               <div class="tier-card" :class="{ 'selected-tier': userTier === 'Tier 1' }">
-                <h3>Tier 1 (Básico)</h3>
-                <p>Gratuito</p>
+                <h3>Básico</h3>
+                <p>Gratis</p>
                 <ul>
-                  <li>Acceso básico a la comunidad</li>
+                  <li>1 personaje personalizado</li>
+                  <li>Acceso a foros básicos</li>
+                  <li>Límite de 5 guías y 5 capturas</li>
+                  <li>10 GB de almacenamiento para contenido</li>
+                  <li>5 publicaciones mensuales</li>
+                  <li>Soporte básico</li>
                 </ul>
                 <button @click="changeTier('Tier 1')" :disabled="userTier === 'Tier 1'">Seleccionar</button>
               </div>
               <div class="tier-card" :class="{ 'selected-tier': userTier === 'Tier 2' }">
-                <h3>Tier 2 (Avanzado)</h3>
-                <p>$5/mes</p>
+                <h3>Avanzado</h3>
+                <p>$5/mes (con 1 año, luego $7/mes)</p>
                 <ul>
-                  <li>Distintivo plateado</li>
-                  <li>Acceso prioritario a contenido</li>
+                  <li>5 personajes personalizados</li>
+                  <li>Acceso a foros avanzados y chats de voz</li>
+                  <li>Límite de 20 guías y 20 capturas</li>
+                  <li>50 GB de almacenamiento para contenido</li>
+                  <li>20 publicaciones mensuales</li>
+                  <li>Soporte prioritario</li>
                 </ul>
                 <button @click="changeTier('Tier 2')" :disabled="userTier === 'Tier 2'">Seleccionar</button>
+                <p>Ahorra 40%</p>
               </div>
               <div class="tier-card" :class="{ 'selected-tier': userTier === 'Tier 3' }">
-                <h3>Tier 3 (Premium)</h3>
-                <p>$10/mes</p>
+                <h3>Premium</h3>
+                <p>$10/mes (con 1 año, luego $12/mes)</p>
                 <ul>
-                  <li>Distintivo dorado</li>
-                  <li>Soporte prioritario</li>
-                  <li>Acceso prioritario a contenido</li>
+                  <li>Personajes ilimitados personalizados</li>
+                  <li>Acceso anticipado a nuevas actualizaciones y contenido exclusivo</li>
+                  <li>Guías y capturas ilimitadas</li>
+                  <li>100 GB de almacenamiento para contenido</li>
+                  <li>Publicaciones ilimitadas</li>
+                  <li>Soporte 24/7 premium</li>
                 </ul>
                 <button @click="changeTier('Tier 3')" :disabled="userTier === 'Tier 3'">Seleccionar</button>
+                <p>Ahorra 92.9% (Plan más vendido)</p>
               </div>
             </div>
+
           </div>
         </div>
       </div>
+
 
       <!-- Statistics Section -->
       <div class="statistics-section">
@@ -373,6 +387,7 @@ export default {
         console.log('Processed user videos:', this.userVideos); // Debug
         this.user.videos = this.userVideos.length; // Update statistics
       } catch (error) {
+        
         const errorMsg = error.response
           ? `${error.response.status}: ${error.response.data.message || error.response.statusText}`
           : error.message;
@@ -382,6 +397,7 @@ export default {
         this.loadingVideos = false;
       }
     },
+
     handleAvatarError(event) {
       event.target.style.display = 'none';
       const placeholder = document.createElement('i');
@@ -462,11 +478,8 @@ export default {
       }
     },
     changeTier(tier) {
-      this.userTier = tier;
-      this.user.tier = tier;
-      this.successMessage = `¡Suscripción actualizada a ${tier}!`;
-      this.errorMessage = '';
-    },
+  this.$router.push({ path: '/compra', query: { tier: tier } });
+},
   },
 };
 </script>

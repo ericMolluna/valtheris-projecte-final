@@ -22,6 +22,7 @@ import VideoDetailsView from '../views/Videos/VideoDetailsView.vue';
 // Vistas de perfil
 import PerfilView from '../views/Profile/PerfilView.vue';
 import EditProfileView from '../views/Profile/EditProfileView.vue';
+import PurchaseView from '@/views/Profile/PurchaseView.vue'; // Asegúrate de que la ruta sea correcta
 
 // Definición de rutas
 const routes = [
@@ -59,6 +60,13 @@ const routes = [
     component: GuideView,
     props: true,
   },
+
+  {
+    path: '/compra',
+    name: 'Purchase',
+    component: PurchaseView,
+  },
+
   {
     path: '/comunidad/crear-guia',
     name: 'CreateGuide',

@@ -8,9 +8,11 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TwitterController;
 use App\Http\Controllers\VideoController;
-
+use App\Http\Controllers\VerificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\VerificationEmail;
 
 // Ruta de prueba para verificar que la API está activa
 Route::get('/test-api-enabled', function () {
@@ -29,14 +31,13 @@ Route::get('/guides/{id}', [GuideController::class, 'show']);
 Route::get('/videos', [VideoController::class, 'index']); // Public route for listing videos
 Route::get('/videos/{id}', [VideoController::class, 'show']); // Public route for showing a single video
 
-
-
 // Rutas protegidas con Sanctum
 Route::middleware('auth:sanctum')->group(function () {
     // Rutas de usuario
     Route::get('/user', [UserController::class, 'getUser']);
     Route::get('/user/comments', [UserController::class, 'getComments']);
     Route::post('/upload-avatar', [UserController::class, 'uploadAvatar']);
+    Route::put('/user/tier', [UserController::class, 'updateTier']);
 
     // Rutas de autenticación
     Route::put('/user', [AuthController::class, 'update']);
@@ -65,24 +66,40 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/screenshots/{id}/like', [ScreenshotController::class, 'like']);
     Route::post('/screenshots/{id}/dislike', [ScreenshotController::class, 'dislike']);
 
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/videos', [VideoController::class, 'index']);
-        Route::post('/videos', [VideoController::class, 'store']);
-        Route::get('/videos/{id}', [VideoController::class, 'show']);
-        Route::delete('/videos/{video}', [VideoController::class, 'destroy']);
-        Route::get('/videos/{id}/comments', [VideoController::class, 'comments']);
-        Route::post('/videos/{id}/comments', [VideoController::class, 'storeComment']);
-        Route::delete('/videos/{video}/comments/{comment}', [VideoController::class, 'destroyComment']);
-        Route::post('/videos/{id}/like', [VideoController::class, 'like']);
-        Route::post('/videos/{id}/dislike', [VideoController::class, 'dislike']);
-    });
+    // Rutas para videos
+    Route::get('/videos', [VideoController::class, 'index']);
+    Route::post('/videos', [VideoController::class, 'store']);
+    Route::get('/videos/{id}', [VideoController::class, 'show']);
+    Route::delete('/videos/{video}', [VideoController::class, 'destroy']);
+    Route::get('/videos/{id}/comments', [VideoController::class, 'comments']);
+    Route::post('/videos/{id}/comments', [VideoController::class, 'storeComment']);
+    Route::delete('/videos/{video}/comments/{comment}', [VideoController::class, 'destroyComment']);
+    Route::post('/videos/{id}/like', [VideoController::class, 'like']);
+    Route::post('/videos/{id}/dislike', [VideoController::class, 'dislike']);
 
     // Rutas para comentarios
     Route::get('/comments', [CommentController::class, 'index']);
     Route::post('/comments', [CommentController::class, 'store']);
     Route::put('/comments/{comment}', [CommentController::class, 'update']);
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy']);
+
+    // Rutas para verificación de email
+    Route::post('/send-verification', [VerificationController::class, 'sendVerificationEmail']);
+    Route::get('/verify-email/{token}', [VerificationController::class, 'verifyEmail']);
+
+// ...existing code...
+Route::get('/test-email', function () {
+    try {
+        $token = 'test-token';
+        $tier = 'Tier 2';
+        $paymentOption = 'monthly';
+        Mail::to('eric.molluna@insbaixcamp.cat')->send(new VerificationEmail($token, $tier, $paymentOption));
+        return response()->json(['message' => 'Email sent']);
+    } catch (\Exception $e) {
+        \Log::error('Error en test-email: ' . $e->getMessage());
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}); 
+
+
 });
-
-
-Route::middleware('auth:sanctum')->put('/user/tier', [UserController::class, 'updateTier']);
