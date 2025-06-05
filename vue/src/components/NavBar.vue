@@ -21,6 +21,8 @@
   </nav>
 </template>
 
+
+
 <script>
 import { isAuthenticated, logout } from '@/api/auth'; // Updated import path
 

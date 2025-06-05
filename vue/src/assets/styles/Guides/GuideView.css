@@ -1,3 +1,5 @@
+/* Import VT323 Font */
+
 /* Reset Default Background */
 html,
 body {
@@ -8,39 +10,52 @@ body {
 
 /* Guide Detail Container */
 .guide-detail-container {
-  font-family: "Press Start 2P", cursive;
-  background: url("@/assets/background-retro.png") no-repeat center center fixed;
+  font-family: 'VT323', monospace;
+  background: url('@/assets/background-retro.png') no-repeat center center fixed;
   background-size: cover;
   min-height: 100vh;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #fff;
+  color: #e0e0e0;
   box-sizing: border-box;
+  position: relative;
+}
+
+.guide-detail-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6); /* Semi-transparent overlay */
+  z-index: 0;
 }
 
 /* Content Wrapper */
 .guide-content-wrapper {
   max-width: 900px;
-  width: 85%;
-  margin: 20px auto;
-  padding: 20px;
-  background: rgba(0, 0, 0, 0.7);
-  border: 4px solid #00ffcc;
-  border-radius: 8px;
-  box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
+  width: 90%;
+  margin: 30px auto;
+  padding: 25px;
+  background: rgba(20, 20, 20, 0.85);
+  border: 2px solid #00ffcc;
+  border-radius: 6px;
+  box-shadow: 0 0 8px rgba(0, 255, 204, 0.3);
   flex-grow: 1;
   box-sizing: border-box;
+  position: relative;
+  z-index: 1;
 }
 
 .loading-message,
 .error-message {
   text-align: center;
   color: #ff0066;
-  font-size: 1em;
-  font-weight: bold;
-  text-shadow: 1px 1px #000;
+  font-size: 1.2em;
+  font-weight: 400;
   margin: 20px 0;
 }
 
@@ -63,10 +78,10 @@ body {
   width: 100px;
   height: 100px;
   position: relative;
-  border-radius: 8px;
+  border-radius: 6px;
   overflow: hidden;
-  border: 4px solid #00ffcc;
-  box-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+  border: 2px solid #00ffcc;
+  box-shadow: 0 0 5px rgba(0, 255, 204, 0.3);
   flex-shrink: 0;
 }
 
@@ -86,10 +101,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #888;
-  font-size: 0.8em;
-  background: #000;
-  text-shadow: 1px 1px #000;
+  color: #888888;
+  font-size: 0.9em;
+  background: #1a1a1a;
+  text-align: center;
 }
 
 .guide-title-container {
@@ -105,9 +120,9 @@ body {
 
 .guide-title {
   color: #ff0066;
-  font-size: 1.5em;
+  font-size: 1.6em;
+  font-weight: 400;
   margin: 0;
-  text-shadow: 2px 2px #000, -2px -2px #00ffcc;
 }
 
 .header-actions {
@@ -117,25 +132,24 @@ body {
 
 .action-btn {
   padding: 8px 15px;
-  border: 3px solid #000;
-  border-radius: 8px;
+  border: 2px solid #000000;
+  border-radius: 6px;
   cursor: pointer;
-  font-family: "Press Start 2P", cursive;
-  font-size: 0.8em;
-  color: #000;
+  font-family: 'VT323', monospace;
+  font-size: 1em;
+  color: #ffffff;
   display: flex;
   align-items: center;
   gap: 8px;
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .action-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
+  transform: translateY(-2px);
 }
 
 .edit-btn {
-  background: linear-gradient(to right, #ffcc00, #ff0066);
+  background: linear-gradient(to right, #ff0066, #00ffcc);
 }
 
 .edit-btn:hover {
@@ -159,21 +173,18 @@ body {
 
 .stars {
   color: #00ffcc;
-  font-size: 1em;
-  text-shadow: 1px 1px #000;
+  font-size: 1.1em;
 }
 
 .rating-text {
-  color: #ffffff;
-  font-size: 0.8em;
-  text-shadow: 1px 1px #000;
+  color: #e0e0e0;
+  font-size: 0.9em;
 }
 
 .guide-author {
   color: #ff0066;
-  font-size: 0.9em;
+  font-size: 1em;
   margin: 5px 0 0;
-  text-shadow: 1px 1px #000;
 }
 
 /* Guide Actions */
@@ -184,11 +195,8 @@ body {
 }
 
 .guide-actions .action-btn {
-  background: linear-gradient(to right, #ffcc00, #ff0066);
-  color: #000;
+  background: linear-gradient(to right, #ff0066, #00ffcc);
   padding: 10px 20px;
-  font-weight: bold;
-  text-shadow: 1px 1px #000;
 }
 
 .guide-actions .action-btn:hover {
@@ -196,16 +204,16 @@ body {
 }
 
 .guide-actions .action-btn:disabled {
-  background: #666;
+  background: #666666;
   cursor: not-allowed;
 }
 
 .guide-actions .like-btn {
-  background: linear-gradient(to right, #ffcc00, #00ffcc);
+  background: linear-gradient(to right, #00ffcc, #ffcc00);
 }
 
 .guide-actions .like-btn:hover:not(:disabled) {
-  background: linear-gradient(to right, #00ffcc, #ffcc00);
+  background: linear-gradient(to right, #ffcc00, #00ffcc);
 }
 
 .guide-actions .dislike-btn {
@@ -226,31 +234,30 @@ body {
 .guide-body {
   background: rgba(20, 20, 20, 0.9);
   padding: 20px;
-  border: 4px solid #00ffcc;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+  border: 2px solid #00ffcc;
+  border-radius: 6px;
+  box-shadow: 0 0 5px rgba(0, 255, 204, 0.3);
 }
 
 .guide-content-text {
-  color: #ffffff;
-  font-family: "Arial", sans-serif;
-  font-size: 0.9em;
+  color: #e0e0e0;
+  font-family: 'VT323', monospace;
+  font-size: 1.1em;
   line-height: 1.6;
-  text-shadow: 1px 1px #000;
 }
 
 .guide-meta {
   background: rgba(20, 20, 20, 0.9);
   padding: 20px;
-  border: 4px solid #00ffcc;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+  border: 2px solid #00ffcc;
+  border-radius: 6px;
+  box-shadow: 0 0 5px rgba(0, 255, 204, 0.3);
 }
 
 .guide-meta h3 {
   color: #ff0066;
-  font-size: 1em;
-  text-shadow: 2px 2px #000, -2px -2px #00ffcc;
+  font-size: 1.2em;
+  font-weight: 400;
   margin-bottom: 15px;
 }
 
@@ -259,21 +266,19 @@ body {
 }
 
 .meta-label {
-  font-weight: bold;
+  font-weight: 400;
   color: #ff0066;
-  text-shadow: 1px 1px #000;
 }
 
 .meta-value {
-  color: #ffffff;
-  text-shadow: 1px 1px #000;
+  color: #e0e0e0;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
   .guide-content-wrapper {
     width: 95%;
-    padding: 15px;
+    padding: 20px;
   }
 
   .guide-header {
@@ -304,17 +309,17 @@ body {
 
 @media (max-width: 480px) {
   .guide-title {
-    font-size: 1.2em;
+    font-size: 1.3em;
   }
 
   .guide-author,
   .rating-text {
-    font-size: 0.7em;
+    font-size: 0.85em;
   }
 
   .action-btn {
     padding: 6px 12px;
-    font-size: 0.7em;
+    font-size: 0.9em;
   }
 
   .guide-actions {
@@ -323,10 +328,10 @@ body {
   }
 
   .guide-content-text {
-    font-size: 0.8em;
+    font-size: 1em;
   }
 
   .guide-meta h3 {
-    font-size: 0.9em;
+    font-size: 1.1em;
   }
 }
