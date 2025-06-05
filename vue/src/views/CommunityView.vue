@@ -175,13 +175,10 @@ export default {
     },
     handleCreateClick() {
       if (this.$route.path === '/comunidad/guias') {
-        // Navigate to CreateGuide view
         this.$router.push({ name: 'CreateGuide' });
       } else if (this.$route.path === '/comunidad/capturas') {
-        // Show screenshot upload form
         this.showUploadForm = true;
       } else if (this.$route.path === '/videos') {
-        // Show video upload form
         this.showVideoUploadForm = true;
       }
     },
