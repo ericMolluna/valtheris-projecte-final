@@ -107,7 +107,7 @@ export default {
     return {
       isAuthenticated,
       userTier,
-      sortBy: 'recent', // Default sorting
+      sortBy: 'recent',
       ...rest,
     };
   },
