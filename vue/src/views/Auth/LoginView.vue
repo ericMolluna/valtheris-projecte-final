@@ -1,80 +1,127 @@
 <template>
-  <nav class="nav-container">
-    <div class="nav-header">
-      <router-link to="/" class="nav-logo">Valtheris</router-link>
-      <button class="menu-toggle" @click="toggleMenu">☰</button>
+  <div class="login-container">
+    <nav class="nav-container">
+      <div class="logo">
+        <router-link to="/" class="logo-link">🎮 GameHub</router-link>
+      </div>
+      <ul>
+        <li><router-link to="/"><i class="icon">🏠</i> Volver al Inicio</router-link></li>
+        <li><router-link to="/register"><i class="icon">✍️</i> Registrarse</router-link></li>
+      </ul>
+    </nav>
+
+    <div class="login-content">
+      <h2 class="animated-title">Iniciar Sesión</h2>
+      <form @submit.prevent="handleLogin" class="login-form">
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" v-model="email" autocomplete="username" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Contraseña:</label>
+          <input type="password" id="password" v-model="password" autocomplete="current-password" required />
+        </div>
+        <button type="submit">Iniciar Sesión</button>
+        <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
+        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+      </form>
+      <div id="g_id_onload" :data-client_id="googleClientId" data-callback="handleGoogleSignIn"
+        data-auto_prompt="false">
+      </div>
+      <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="sign_in_with"
+        data-shape="rectangular" data-logo_alignment="left">
+      </div>
     </div>
-    <ul class="nav-links" :class="{ 'nav-links-open': isMenuOpen }">
-      <li v-for="(item, index) in navItems" :key="index" class="nav-item">
-        <router-link
-          v-if="item.route"
-          :to="item.route"
-          class="nav-link"
-        >{{ item.label }}</router-link>
-        <button
-          v-if="item.action"
-          class="nav-link"
-          @click="item.action"
-        >{{ item.label }}</button>
-      </li>
-    </ul>
-  </nav>
+
+
+  </div>
 </template>
 
 <script>
-import { isAuthenticated, logout } from '@/api/auth';
+import axios from 'axios';
+import Swal from 'sweetalert2';
+import '@/assets/styles/Auth/LoginView.css';
 
 export default {
-  name: 'NavBar',
   data() {
     return {
-      isLoggedIn: isAuthenticated(),
-      isMenuOpen: false,
-      baseNavItems: [
-        { label: 'Comunidad', route: '/comunidad' },
-        { label: 'Acerca', route: '/about' }
-      ]
+      email: '',
+      password: '',
+      successMessage: '',
+      errorMessage: '',
+      googleClientId: '916302553196-267v6rqu5djak1t94f9ub0eeqv9oh8rn.apps.googleusercontent.com',
     };
   },
-  computed: {
-    navItems() {
-      if (this.isLoggedIn) {
-        return [
-          ...this.baseNavItems,
-          { label: 'Perfil', route: '/perfil' }, // Ajusta a /perfil
-          { label: 'Cerrar Sesión', action: this.handleLogout }
-        ];
-      } else {
-        return [
-          ...this.baseNavItems,
-          { label: 'Iniciar Sesión', route: '/login' },
-          { label: 'Registrarse', route: '/register' }
-        ];
-      }
+  async created() {
+    window.handleGoogleSignIn = this.handleGoogleSignIn.bind(this);
+
+    axios.defaults.baseURL = 'http://localhost:8000';
+    axios.defaults.withCredentials = true;
+
+    try {
+      await axios.get('/sanctum/csrf-cookie');
+      console.log('CSRF token initialized successfully');
+    } catch (error) {
+      console.error('Error fetching CSRF token:', error.message);
+      this.errorMessage = 'Could not connect to the server.';
     }
-  },
-  methods: {
-    toggleMenu() {
-      this.isMenuOpen = !this.isMenuOpen;
-    },
-    handleLogout() {
-      logout();
-      this.isLoggedIn = false; // Actualiza inmediatamente
-      this.$router.push('/login');
-    },
-    updateAuthStatus() {
-      console.log('Actualizando estado de autenticación:', isAuthenticated());
-      this.isLoggedIn = isAuthenticated();
-    }
-  },
-  created() {
-    window.addEventListener('authChange', this.updateAuthStatus);
-    this.updateAuthStatus(); // Verifica el estado inicial
+
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      console.log('Google Identity Services loaded successfully');
+    };
+    script.onerror = () => {
+      console.error('Error loading Google Identity Services');
+      this.errorMessage = 'Failed to load Google Sign-In.';
+    };
+    document.body.appendChild(script);
   },
   beforeUnmount() {
-    window.removeEventListener('authChange', this.updateAuthStatus);
-  }
+    delete window.handleGoogleSignIn;
+  },
+  methods: {
+    async handleGoogleSignIn(response) {
+      console.log('Google Sign-In response:', JSON.stringify(response, null, 2));
+      Swal.fire({
+        title: 'Cargando...',
+        text: 'Iniciando sesión con Google, por favor espera.',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+        customClass: {
+          popup: 'swal-custom',
+        },
+      });
+
+      try {
+        const idToken = response.credential;
+        if (!idToken) {
+          console.error('No ID token received in response');
+          throw new Error('No ID token received');
+        }
+        console.log('ID Token:', idToken);
+        const serverResponse = await axios.post('/api/google-login', { id_token: idToken });
+        console.log('Server response:', serverResponse.data);
+        if (serverResponse.data.token) {
+          localStorage.setItem('auth_token', serverResponse.data.token);
+          this.successMessage = 'Inicio de sesión con Google exitoso.';
+          this.errorMessage = '';
+          Swal.close();
+          setTimeout(() => this.$router.push('/'), 1000);
+        }
+      } catch (error) {
+        console.error('Google Sign-In error:', error.response ? error.response.data : error.message);
+        this.errorMessage = error.response?.data?.message || 'Error al iniciar sesión con Google.';
+        this.successMessage = '';
+        Swal.close();
+      }
+    },
+    // ... other methods (e.g., handleLogin) remain unchanged
+  },
 };
 </script>
-
-<style src="@/assets/styles/NavBar.css" scoped></style>

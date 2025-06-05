@@ -173,17 +173,9 @@ export default {
         this.openVideoModal(item);
       }
     },
-    handleCreateClick() {
-      if (this.$route.path === '/comunidad/guias') {
-        this.$router.push({ name: 'CreateGuide' });
-      } else if (this.$route.path === '/comunidad/capturas') {
-        this.showUploadForm = true;
-      } else if (this.$route.path === '/videos') {
-        this.showVideoUploadForm = true;
-      }
-    },
-  },
-};
+  }
+    
+}
 </script>
 
 <style src="@/assets/styles/CommunityView.css" scoped></style>

@@ -20,7 +20,7 @@ Route::get('/test-api-enabled', function () {
 // Rutas públicas
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/google-login', [AuthController::class, 'googleLogin']);
+Route::post('/google-login', [AuthController::class, 'handleGoogleLogin']);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
