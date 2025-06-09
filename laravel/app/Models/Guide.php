@@ -29,4 +29,9 @@ class Guide extends Model
         return $this->belongsToMany(User::class, 'guide_user_dislike')
                     ->withTimestamps();
     }
+
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class);
+    }
 }

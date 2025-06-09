@@ -11,22 +11,20 @@
       <div v-else-if="guide" class="guide-content">
         <div class="guide-header">
           <div class="guide-image-container">
-            <img
-              v-if="guide.image"
-              :src="guide.image"
-              alt="Portada de la guía"
-              @error="handleImageError"
-            />
-            <div v-else class="no-image-placeholder">Sin imagen</div>
-          </div>
+    <div v-if="guide.image">Debug: {{ guide.image }}</div>
+    <img
+        v-if="guide.image"
+        :src="guide.image"
+        alt="Portada de la guía"
+        @error="handleImageError"
+    />
+    <div v-else class="no-image-placeholder">Sin imagen</div>
+</div>
           <div class="guide-title-container">
             <div class="title-and-actions">
               <h1 class="guide-title">{{ guide.title }}</h1>
               <!-- Botones de Editar y Eliminar -->
-              <div
-                class="header-actions"
-                v-if="isAuthenticated && guide.createdBy === user?.name"
-              >
+              <div class="header-actions" v-if="isAuthenticated && guide.createdBy === user?.name">
                 <button class="action-btn edit-btn" @click="editGuide">
                   <span class="icon">✏️</span> Editar
                 </button>
@@ -40,9 +38,8 @@
               <span class="rating-text">
                 {{
                   averageRating > 0
-                    ? `${averageRating.toFixed(1)}/5 (${
-                        ratings.length
-                      } valoraciones)`
+                    ? `${averageRating.toFixed(1)}/5 (${ratings.length
+                    } valoraciones)`
                     : "No hay suficientes valoraciones"
                 }}
               </span>
@@ -52,18 +49,11 @@
         </div>
 
         <div class="guide-actions">
-          <button
-            class="action-btn like-btn"
-            :disabled="!isAuthenticated || guide.user_liked"
-            @click="likeGuide"
-          >
+          <button class="action-btn like-btn" :disabled="!isAuthenticated || guide.user_liked" @click="likeGuide">
             <span class="icon">👍</span> Me gusta ({{ guide.likes || 0 }})
           </button>
-          <button
-            class="action-btn dislike-btn"
-            :disabled="!isAuthenticated || guide.user_disliked"
-            @click="dislikeGuide"
-          >
+          <button class="action-btn dislike-btn" :disabled="!isAuthenticated || guide.user_disliked"
+            @click="dislikeGuide">
             <span class="icon">👎</span> No me gusta ({{ guide.dislikes || 0 }})
           </button>
         </div>
@@ -180,38 +170,57 @@ export default {
       }
     },
     async fetchGuide() {
-      this.loading = true;
-      this.errorMessage = "";
-      try {
+    this.loading = true;
+    this.errorMessage = "";
+    try {
         const guideId = this.$route.params.id;
-        axios.defaults.baseURL = "http://localhost:8000";
+        console.log('Guide ID:', guideId);
+        if (!guideId || typeof guideId !== 'string' || guideId === '[object Object]') {
+            throw new Error('Invalid guide ID');
+        }
+        const apiBaseUrl = process.env.VUE_APP_API_BASE_URL || "http://localhost:8000";
+        console.log("API Base URL used:", apiBaseUrl);
+        axios.defaults.baseURL = apiBaseUrl;
         axios.defaults.withCredentials = true;
         await axios.get("sanctum/csrf-cookie");
         const response = await axios.get(`/api/guides/${guideId}`);
+        console.log("API Response:", response.data);
+        console.log("Image URL from API:", response.data.image_url);
+        const fullImageUrl = response.data.image_url
+            ? `${apiBaseUrl}${response.data.image_url}`
+            : null;
+        console.log("Full Image URL:", fullImageUrl);
         this.guide = {
-          ...response.data,
-          likes: response.data.likes || 0,
-          dislikes: response.data.dislikes || 0,
-          user_liked: response.data.user_liked || false,
-          user_disliked: response.data.user_disliked || false,
-          image: response.data.image_url
-            ? `http://localhost:8000${response.data.image_url}`
-            : null,
+            ...response.data,
+            likes: response.data.likes || 0,
+            dislikes: response.data.dislikes || 0,
+            user_liked: response.data.user_liked || false,
+            user_disliked: response.data.user_disliked || false,
+            image: fullImageUrl,
+            createdBy: response.data.createdBy || 'Anónimo',
         };
-        this.guide.createdBy =
-          this.guide.user?.name ||
-          this.guide.user?.username ||
-          this.guide.user?.email ||
-          "Anónimo";
-        console.log("Datos de la guía:", this.guide);
-      } catch (error) {
-        this.errorMessage =
-          error.response?.data?.message || "Error al cargar la guía";
-        console.error("Error al cargar la guía:", error);
-      } finally {
+        if (!response.data.image_url) {
+            console.warn("No image URL provided by the API for guide ID:", guideId);
+        }
+    } catch (error) {
+        console.error("Fetch guide error:", {
+            status: error.response?.status,
+            message: error.response?.data?.message || error.message,
+            error,
+        });
+        if (error.response?.status === 404 || error.message === 'Invalid guide ID') {
+            this.errorMessage = "Guía no encontrada";
+            this.$router.push('/comunidad');
+        } else if (error.response?.status === 401 || error.response?.status === 403) {
+            this.errorMessage = "Sesión expirada o no autorizado";
+            this.$router.push('/login');
+        } else {
+            this.errorMessage = error.response?.data?.message || "Error al cargar la guía";
+        }
+    } finally {
         this.loading = false;
-      }
-    },
+    }
+},
     async likeGuide() {
       if (!this.isAuthenticated) {
         alert('Debes iniciar sesión para dar "Me gusta".');
@@ -240,9 +249,8 @@ export default {
       } catch (error) {
         console.error('Error al dar "Me gusta":', error);
         const errorMsg = error.response
-          ? `Error ${error.response.status}: ${
-              error.response.data.message || error.response.statusText
-            }`
+          ? `Error ${error.response.status}: ${error.response.data.message || error.response.statusText
+          }`
           : error.message;
         alert(`No se pudo dar "Me gusta": ${errorMsg}`);
       }
@@ -275,19 +283,21 @@ export default {
       } catch (error) {
         console.error('Error al dar "No me gusta":', error);
         const errorMsg = error.response
-          ? `Error ${error.response.status}: ${
-              error.response.data.message || error.response.statusText
-            }`
+          ? `Error ${error.response.status}: ${error.response.data.message || error.response.statusText
+          }`
           : error.message;
         alert(`No se pudo dar "No me gusta": ${errorMsg}`);
       }
     },
     handleImageError(event) {
+      console.error("Image failed to load:", event.target.src);
       event.target.style.display = "none";
-      const placeholder = document.createElement("div");
-      placeholder.className = "no-image-placeholder";
-      placeholder.textContent = "Sin imagen disponible";
-      event.target.parentNode.appendChild(placeholder);
+      if (!event.target.parentNode.querySelector(".no-image-placeholder")) {
+        const placeholder = document.createElement("div");
+        placeholder.className = "no-image-placeholder";
+        placeholder.textContent = "Sin imagen disponible";
+        event.target.parentNode.appendChild(placeholder);
+      }
     },
     formatDate(dateString) {
       if (!dateString) return "Fecha desconocida";

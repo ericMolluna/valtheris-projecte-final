@@ -113,12 +113,16 @@ export default function CommunityViewLogic() {
   }
 
   async function fetchGuides() {
-    await fetchData('/api/guides/all', 'guides', 'guide', (item) => ({
-      ...item,
-      image: item.image ? `http://localhost:8000${item.image}` : null,
-    }));
-  }
-
+    await fetchData('/api/guides/all', 'guides', 'guide', (item) => {
+        const transformed = {
+            ...item,
+            image: item.image_url ? `http://localhost:8000${item.image_url}` : '/images/placeholder.jpg',
+            type: 'guide',
+        };
+        console.log('Transformed guide:', transformed);
+        return transformed;
+    });
+}
   async function fetchScreenshots() {
     await fetchData('/api/screenshots', 'screenshots', 'screenshot', (item) => ({
       ...item,
@@ -132,11 +136,12 @@ export default function CommunityViewLogic() {
 
   async function fetchVideos() {
     await fetchData('/api/videos', 'videos', 'video', (item) => ({
-      ...item,
-      video_url: `http://localhost:8000${item.video_url}`,
-      thumbnail_url: item.thumbnail_url ? `http://localhost:8000${item.thumbnail_url}` : 'https://via.placeholder.com/280x150?text=Sin+miniatura',
+        ...item,
+        video_url: `http://localhost:8000${item.video_url}`,
+        thumbnail_url: item.thumbnail_url ? `http://localhost:8000${item.thumbnail_url}` : '/images/placeholder.jpg',
+        type: 'video',
     }));
-  }
+}
 
   function combineAllContent() {
     state.loadingAllContent = true;

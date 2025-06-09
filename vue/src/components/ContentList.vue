@@ -1,70 +1,66 @@
 <template>
     <div class="content-list">
-      <div v-if="loading" class="loading-message">Cargando contenido...</div>
-      <div v-else-if="errorMessage" class="error-message">{{ errorMessage }}</div>
-      <div v-else-if="items.length === 0" class="no-content-placeholder">
-      </div>
-      <div v-else class="items-grid">
-        <div v-for="item in items" :key="item.id + '-' + item.type" class="content-card" @click="$emit('item-click', item)" :title="getContentTitle(item)">
-          <div v-if="item.type === 'guide'" class="guide-card">
-            <div class="guide-card-image">
-              <img v-if="item.image" :src="item.image" alt="Portada de la guía" @error="handleImageError" />
-              <div v-else class="no-image-placeholder">Sin imagen</div>
-            </div>
-            <div class="guide-card-content">
-              <h3 class="guide-title">{{ item.title || 'Sin título' }}</h3>
-              <p class="guide-description">{{ item.description || 'Sin descripción' }}</p>
-            </div>
-          </div>
-          <div v-else-if="item.type === 'screenshot'" class="screenshot-card">
-            <div class="screenshot-image">
-              <img :src="item.image_url" alt="Captura del juego" @error="handleImageError" />
-            </div>
-            <div class="screenshot-meta">
-              <span>{{ item.title || 'Sin título' }}</span>
-            </div>
-          </div>
-          <div v-else-if="item.type === 'video'" class="video-card">
-            <div class="video-thumbnail">
-              <img :src="item.thumbnail_url || 'https://via.placeholder.com/280x150?text=Sin+miniatura'" alt="Miniatura del video" @error="handleImageError" />
-              <div class="play-icon">▶</div>
-            </div>
-            <div class="video-meta">
-              <span>{{ item.title || 'Sin título' }}</span>
-            </div>
-          </div>
+        <div v-if="loading" class="loading-message">Cargando contenido...</div>
+        <div v-else-if="errorMessage" class="error-message">{{ errorMessage }}</div>
+        <div v-else-if="items.length === 0" class="no-content-placeholder">
+            No hay contenido disponible.
         </div>
-      </div>
+        <div v-else class="items-grid">
+            <div v-for="item in items" :key="item.id + '-' + item.type" class="content-card" @click="$emit('item-click', item)" :title="getContentTitle(item)">
+                <div v-if="item.type === 'guide'" class="guide-card">
+                    <div class="guide-card-image">
+                        <img :src="item.image || '/images/placeholder.jpg'" alt="Portada de la guía" @error="handleImageError" />
+                    </div>
+                    <div class="guide-card-content">
+                        <h3 class="guide-title">{{ item.title || 'Sin título' }}</h3>
+                        <p class="guide-description">{{ item.description || 'Sin descripción' }}</p>
+                    </div>
+                </div>
+                <div v-else-if="item.type === 'screenshot'" class="screenshot-card">
+                    <div class="screenshot-image">
+                        <img :src="item.image_url || '/images/placeholder.jpg'" alt="Captura del juego" @error="handleImageError" />
+                    </div>
+                    <div class="screenshot-meta">
+                        <span>{{ item.title || 'Sin título' }}</span>
+                    </div>
+                </div>
+                <div v-else-if="item.type === 'video'" class="video-card">
+                    <div class="video-thumbnail">
+                        <img :src="item.thumbnail_url || '/images/placeholder.jpg'" alt="Miniatura del video" @error="handleImageError" />
+                        <div class="play-icon">▶</div>
+                    </div>
+                    <div class="video-meta">
+                        <span>{{ item.title || 'Sin título' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </template>
+</template>
 
-  <script>
-  export default {
+<script>
+export default {
     name: 'ContentList',
     props: {
-      items: Array,
-      loading: Boolean,
-      errorMessage: String,
+        items: Array,
+        loading: Boolean,
+        errorMessage: String,
     },
     emits: ['item-click'],
     methods: {
-      getContentTitle(item) {
-        if (item.type === 'guide') return 'Guía: Información detallada creada por la comunidad';
-        if (item.type === 'screenshot') return 'Captura: Imagen subida por un usuario';
-        if (item.type === 'video') return 'Video: Video subido por un usuario';
-        return '';
-      },
-      handleImageError(event) {
-        event.target.style.display = 'none';
-        const placeholder = document.createElement('div');
-        placeholder.className = 'no-image-placeholder';
-        placeholder.textContent = 'Sin imagen';
-        event.target.parentNode.appendChild(placeholder);
-      },
+        getContentTitle(item) {
+            if (item.type === 'guide') return 'Guía: Información detallada creada por la comunidad';
+            if (item.type === 'screenshot') return 'Captura: Imagen subida por un usuario';
+            if (item.type === 'video') return 'Video: Video subido por un usuario';
+            return '';
+        },
+        handleImageError(event) {
+            event.target.src = '/images/placeholder.jpg';
+            event.target.style.display = '';
+        },
     },
-  };
-  </script>
-
+};
+</script>
   <style scoped>
   .content-list {
   display: flex;

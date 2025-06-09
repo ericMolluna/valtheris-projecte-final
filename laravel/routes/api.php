@@ -90,5 +90,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('auth:sanctum')->post('/subscribe', [UserController::class, 'subscribe']);
 
 
+    Route::get('/guides/{id}/ratings', [GuideController::class, 'ratings']);
 
 });
