@@ -63,6 +63,10 @@ export default {
 </script>
 
 <style scoped>
+
+.h3 {
+  color: white;
+}
 .upload-form-modal {
   position: fixed;
   top: 0;
@@ -131,5 +135,13 @@ input, textarea {
   color: #ff6f61;
   text-align: center;
   margin-top: 10px;
+}
+h3 {
+  color: #00ffcc;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
 }
 </style>  

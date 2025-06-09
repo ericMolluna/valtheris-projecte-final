@@ -24,13 +24,14 @@ class UserController extends Controller
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
-            'avatar' => $user->avatar, // Include avatar in the response
+            'avatar' => $user->avatar,
             'screenshots' => $user->screenshots,
             'comments' => $user->comments,
             'inventory' => $user->inventory ?? 0,
             'videos' => $user->videos ?? 0,
             'workshopItems' => $user->workshopItems ?? 0,
             'artwork' => $user->artwork ?? 0,
+            'tier' => $user->tier ?? 'Tier 1', // Include tier in response
         ]);
     }
 
@@ -85,24 +86,48 @@ class UserController extends Controller
         ]);
     }
 
-    public function updateTier(Request $request)
+    /**
+     * Procesa la suscripción del usuario.
+     */
+    public function subscribe(Request $request)
     {
-        $request->validate([
-            'tier' => 'required|string|in:Tier 1,Tier 2,Tier 3',
+        $validated = $request->validate([
+            'tier' => 'required|in:Tier 1,Tier 2,Tier 3',
+            'paymentOption' => 'required|in:monthly,yearly',
+            'cardNumber' => 'required|string',
+            'cardHolder' => 'required|string',
+            'expiryDate' => 'required|string',
+            'cvv' => 'required|string',
         ]);
 
-        $user = Auth::user(); // Obtener usuario autenticado
+        // Simulate payment processing
+        // In a real app, integrate with a payment gateway like Stripe
+        // Optionally store subscription details in a subscriptions table
 
-        if (!$user) {
-            return response()->json(['message' => 'Usuario no autenticado'], 401);
-        }
+        return response()->json(['message' => 'Subscription processed successfully']);
+    }
 
-        $user->tier = $request->input('tier');
+    /**
+     * Actualiza el tier del usuario autenticado.
+     */
+    public function updateTier(Request $request)
+    {
+        $validated = $request->validate([
+            'tier' => 'required|in:Tier 1,Tier 2,Tier 3',
+        ]);
+
+        $user = Auth::user();
+        $user->tier = $request->tier;
         $user->save();
 
         return response()->json([
-            'message' => 'Tier actualizado correctamente',
-            'tier' => $user->tier
+            'message' => 'Tier updated successfully',
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'tier' => $user->tier,
+            ]
         ]);
     }
 }

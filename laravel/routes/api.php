@@ -87,19 +87,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/send-verification', [VerificationController::class, 'sendVerificationEmail']);
     Route::get('/verify-email/{token}', [VerificationController::class, 'verifyEmail']);
 
-// ...existing code...
-Route::get('/test-email', function () {
-    try {
-        $token = 'test-token';
-        $tier = 'Tier 2';
-        $paymentOption = 'monthly';
-        Mail::to('eric.molluna@insbaixcamp.cat')->send(new VerificationEmail($token, $tier, $paymentOption));
-        return response()->json(['message' => 'Email sent']);
-    } catch (\Exception $e) {
-        \Log::error('Error en test-email: ' . $e->getMessage());
-        return response()->json(['error' => $e->getMessage()], 500);
-    }
-}); 
+    Route::middleware('auth:sanctum')->post('/subscribe', [UserController::class, 'subscribe']);
+
 
 
 });

@@ -20,11 +20,12 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'avatar',         // Added for avatar upload
-        'inventory',      // Added for statistics
-        'videos',         // Added for statistics
-        'workshopItems',  // Added for statistics
-        'artwork',        // Added for statistics
+        'avatar',
+        'inventory',
+        'videos',
+        'workshopItems',
+        'artwork',
+        'tier', // Added tier to fillable
     ];
 
     /**

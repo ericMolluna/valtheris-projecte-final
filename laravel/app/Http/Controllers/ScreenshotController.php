@@ -84,27 +84,34 @@ class ScreenshotController extends Controller
     public function store(Request $request)
     {
         try {
+            // Validate input
             $validated = $request->validate([
                 'title' => 'required|string|max:255',
-                'image' => 'required|image|max:2048',
+                'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
                 'description' => 'nullable|string|max:255',
             ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::error('Validación fallida: ' . json_encode($e->errors()));
-            return response()->json(['message' => 'Validación fallida', 'errors' => $e->errors()], 422);
-        }
 
-        try {
+            // Ensure user is authenticated
+            if (!Auth::check()) {
+                Log::warning('Intento de subir captura sin autenticación');
+                return response()->json(['message' => 'No autorizado'], 401);
+            }
+
+            // Store the image
             $imagePath = $request->file('image')->store('screenshots', 'public');
+            $imageUrl = '/storage/' . $imagePath;
+
+            // Create screenshot record
             $screenshot = Screenshot::create([
                 'user_id' => Auth::id(),
-                'image_url' => '/storage/' . $imagePath,
-                'description' => $request->description,
-                'title' => $request->title,
+                'image_url' => $imageUrl,
+                'title' => $validated['title'],
+                'description' => $validated['description'],
                 'likes' => 0,
                 'dislikes' => 0,
             ]);
 
+            // Load user relationship
             $screenshot->load('user');
 
             return response()->json([
@@ -114,7 +121,7 @@ class ScreenshotController extends Controller
                     'user_id' => $screenshot->user_id,
                     'username' => $screenshot->user ? $screenshot->user->name : 'Anónimo',
                     'title' => $screenshot->title,
-                    'image_url' => $screenshot->image_url,
+                    'image_url' => $imageUrl,
                     'description' => $screenshot->description,
                     'likes' => $screenshot->likes,
                     'dislikes' => $screenshot->dislikes,
@@ -123,9 +130,12 @@ class ScreenshotController extends Controller
                     'updated_at' => $screenshot->updated_at,
                 ],
             ], 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validación fallida al subir captura: ' . json_encode($e->errors()));
+            return response()->json(['message' => 'Validación fallida', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            Log::error('Error al subir captura: ' . $e->getMessage());
-            return response()->json(['message' => 'Error al subir captura'], 500);
+            Log::error('Error al subir captura: ' . $e->getMessage() . ' | Stack: ' . $e->getTraceAsString());
+            return response()->json(['message' => 'Error al subir captura: ' . $e->getMessage()], 500);
         }
     }
 

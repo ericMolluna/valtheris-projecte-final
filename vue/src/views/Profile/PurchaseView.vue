@@ -43,10 +43,6 @@
             <input type="text" id="cvv" v-model="cvv" placeholder="123" maxlength="3" required />
           </div>
         </div>
-        <div class="form-group">
-          <label for="email">Correo Electrónico para Verificación</label>
-          <input type="email" id="email" v-model="email" placeholder="tuemail@ejemplo.com" required />
-        </div>
         <div class="button-group">
           <button class="back-btn" @click="goBack">Volver</button>
           <button class="submit-btn" @click="submitPayment" :disabled="isSubmitting">
@@ -54,10 +50,7 @@
           </button>
         </div>
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-        <p v-if="successMessage" class="success-message">
-          {{ successMessage }}
-          <a href="#" @click.prevent="checkVerification">Verificar Ahora</a>
-        </p>
+        <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
       </div>
     </div>
   </div>
@@ -81,17 +74,14 @@ export default {
       cardHolder: '',
       expiryDate: '',
       cvv: '',
-      email: '',
       isSubmitting: false,
       errorMessage: '',
       successMessage: '',
-      verificationToken: null,
     };
   },
   created() {
     this.tier = this.$route.query.tier || 'Tier 1';
     this.tierName = this.tier === 'Tier 1' ? 'Básico' : this.tier === 'Tier 2' ? 'Avanzado' : 'Premium';
-    this.email = this.$root.user?.email || '';
   },
   methods: {
     formatCardNumber() {
@@ -109,7 +99,7 @@ export default {
     goBack() {
       this.$router.push('/perfil');
     },
-    async submitPayment() {
+   async submitPayment() {
   this.errorMessage = '';
   this.successMessage = '';
   this.isSubmitting = true;
@@ -123,54 +113,44 @@ export default {
       throw new Error('No hay token de autenticación');
     }
 
-    const response = await axios.post('/api/send-verification', {
-      email: this.email,
+    // Process subscription
+    await axios.post('/api/subscribe', {
       tier: this.tier,
       paymentOption: this.paymentOption,
+      cardNumber: this.cardNumber,
+      cardHolder: this.cardHolder,
+      expiryDate: this.expiryDate,
+      cvv: this.cvv,
     }, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
-    this.verificationToken = response.data.token;
-    this.successMessage = `Suscripción procesada con éxito. Se ha enviado un correo de verificación a ${this.email}.`;
+    // Update user tier
+    const tierResponse = await axios.put('/api/user/tier', {
+      tier: this.tier,
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    // Update frontend user data
+    this.$root.user = tierResponse.data.user;
+
+    this.successMessage = `¡Suscripción a ${this.tierName} procesada con éxito!`;
+    setTimeout(() => {
+      this.$router.push('/perfil');
+    }, 2000);
   } catch (error) {
     console.error('Error en submitPayment:', error);
-    this.errorMessage = `Error al enviar el correo de verificación: ${error.response?.data?.message || error.message}`;
+    this.errorMessage = `Error al procesar la suscripción: ${error.response?.data?.message || error.message}`;
   } finally {
     this.isSubmitting = false;
   }
-},
-    async checkVerification() {
-      if (!this.verificationToken) {
-        this.errorMessage = 'No se ha generado un token de verificación. Por favor, confirma la suscripción primero.';
-        return;
-      }
-
-      try {
-        const token = localStorage.getItem('auth_token');
-        const response = await axios.get(`/api/verify-email/${this.verificationToken}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.data.success) {
-          this.successMessage = `Correo verificado con éxito. ¡Tu suscripción a ${this.tierName} ha sido activada!`;
-          this.$root.user.tier = this.tier;
-          setTimeout(() => {
-            this.$router.push('/perfil');
-          }, 2000);
-        } else {
-          this.errorMessage = 'La verificación falló. Revisa tu correo o intenta de nuevo.';
-        }
-      } catch (error) {
-        this.errorMessage = 'Error al verificar el correo. Intenta de nuevo.';
-        console.error('Error en checkVerification:', error);
-      }
-    },
-  },
+}
+  }
 };
 </script>
 
@@ -357,17 +337,6 @@ export default {
   font-size: 1em;
   text-align: center;
   margin-top: 15px;
-}
-
-.success-message a {
-  color: #ff0066;
-  text-decoration: underline;
-  margin-left: 5px;
-  transition: color 0.3s;
-}
-
-.success-message a:hover {
-  color: #ff9999;
 }
 
 @media (max-width: 600px) {

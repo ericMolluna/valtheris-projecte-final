@@ -367,90 +367,90 @@ export default {
         this.imagePreview = null;
       }
     },
-    async uploadScreenshot() {
-      if (!this.newScreenshot.image) {
-        this.uploadError = 'Por favor, selecciona una imagen válida.';
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: this.uploadError,
-          confirmButtonColor: '#ff0066',
-        });
-        return;
-      }
-      if (!this.newScreenshot.title.trim()) {
-        this.uploadError = 'Por favor, proporciona un título.';
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: this.uploadError,
-          confirmButtonColor: '#ff0066',
-        });
-        return;
-      }
-      const maxSize = 2048 * 1024;
-      if (this.newScreenshot.image.size > maxSize) {
-        this.uploadError = 'La imagen excede el tamaño máximo de 2MB.';
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: this.uploadError,
-          confirmButtonColor: '#ff0066',
-        });
-        return;
-      }
-      if (!this.newScreenshot.image.type.startsWith('image/')) {
-        this.uploadError = 'El archivo seleccionado no es una imagen válida.';
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: this.uploadError,
-          confirmButtonColor: '#ff0066',
-        });
-        return;
-      }
+  async uploadScreenshot() {
+  if (!this.newScreenshot.image) {
+    this.uploadError = 'Por favor, selecciona una imagen válida.';
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: this.uploadError,
+      confirmButtonColor: '#ff0066',
+    });
+    return;
+  }
+  if (!this.newScreenshot.title.trim()) {
+    this.uploadError = 'Por favor, proporciona un título.';
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: this.uploadError,
+      confirmButtonColor: '#ff0066',
+    });
+    return;
+  }
+  const maxSize = 2048 * 1024;
+  if (this.newScreenshot.image.size > maxSize) {
+    this.uploadError = 'La imagen excede el tamaño máximo de 2MB.';
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: this.uploadError,
+      confirmButtonColor: '#ff0066',
+    });
+    return;
+  }
+  if (!this.newScreenshot.image.type.startsWith('image/')) {
+    this.uploadError = 'El archivo seleccionado no es una imagen válida.';
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: this.uploadError,
+      confirmButtonColor: '#ff0066',
+    });
+    return;
+  }
 
-      const formData = new FormData();
-      formData.append('title', this.newScreenshot.title);
-      formData.append('image', this.newScreenshot.image);
-      formData.append('description', this.newScreenshot.description || '');
+  const formData = new FormData();
+  formData.append('title', this.newScreenshot.title);
+  formData.append('image', this.newScreenshot.image);
+  formData.append('description', this.newScreenshot.description || '');
 
-      try {
-        this.isUploading = true;
-        axios.defaults.baseURL = 'http://localhost:8000';
-        axios.defaults.withCredentials = true;
-        await axios.get('sanctum/csrf-cookie');
-        const token = localStorage.getItem('auth_token');
-        if (!token) throw new Error('No se encontró el token de autenticación.');
-        await axios.post('/api/screenshots', formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        this.closeUploadForm();
-        await this.fetchScreenshots();
-        Swal.fire({
-          icon: 'success',
-          title: '¡Captura subida!',
-          text: 'Tu captura ha sido subida exitosamente.',
-          timer: 2000,
-          showConfirmButton: false,
-        });
-      } catch (error) {
-        this.uploadError = error.response
-          ? error.response.data.message || `Error ${error.response.status}`
-          : error.message;
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: this.uploadError,
-          confirmButtonColor: '#ff0066',
-        });
-      } finally {
-        this.isUploading = false;
-      }
-    },
+  try {
+    this.isUploading = true;
+    axios.defaults.baseURL = 'http://localhost:8000';
+    axios.defaults.withCredentials = true;
+    await axios.get('sanctum/csrf-cookie');
+    const token = localStorage.getItem('auth_token');
+    if (!token) throw new Error('No se encontró el token de autenticación.');
+    await axios.post('/api/screenshots', formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    this.closeUploadForm();
+    await this.fetchScreenshots();
+    Swal.fire({
+      icon: 'success',
+      title: '¡Captura subida!',
+      text: 'Tu captura ha sido subida exitosamente.',
+      timer: 2000,
+      showConfirmButton: false,
+    });
+  } catch (error) {
+    this.uploadError = error.response
+      ? error.response.data.message || `Error ${error.response.status}`
+      : error.message;
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: this.uploadError,
+      confirmButtonColor: '#ff0066',
+    });
+  } finally {
+    this.isUploading = false;
+  }
+},
     async deleteScreenshot(screenshotId) {
       const result = await Swal.fire({
         title: '¿Estás seguro?',
@@ -737,3 +737,5 @@ export default {
   },
 };
 </script>
+
+<style src="@/assets/styles/Screenshots/ScreenshotsView.css" scoped></style>

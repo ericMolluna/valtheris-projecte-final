@@ -13,7 +13,7 @@
         >{{ item.label }}</router-link>
         <button
           v-if="item.action"
-          class="nav-link"
+          class="nav-link logout-btn" 
           @click="item.action"
         >{{ item.label }}</button>
       </li>

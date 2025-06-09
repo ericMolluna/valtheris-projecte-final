@@ -5,7 +5,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-family: 'Press Start 2P', cursive;
   color: #fff;
 }
 
@@ -683,7 +682,7 @@
 }
 
 .submit-comment-btn {
-  background: linear-gradient(90deg, #ff0066, #00ffcc);
+  background: linear-gradient(90deg, #ff0066, #ffffff);
   color: #1e1e2f;
   padding: 8px 15px;
   border: none;
