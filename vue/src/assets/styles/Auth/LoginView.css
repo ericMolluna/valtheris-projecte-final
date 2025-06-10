@@ -66,7 +66,6 @@
   border: 2px solid #1a3c34;
   border-radius: 4px;
   background: #fff;
-  color: #000 !important; /* Changed to black for visibility against white background */
   box-sizing: border-box;
 }
 

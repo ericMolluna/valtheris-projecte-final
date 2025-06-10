@@ -139,6 +139,8 @@ class ScreenshotController extends Controller
         }
     }
 
+    
+
     public function destroy(Screenshot $screenshot)
     {
         try {
@@ -159,6 +161,47 @@ class ScreenshotController extends Controller
             return response()->json(['message' => 'Error al eliminar captura'], 500);
         }
     }
+
+    public function rate(Request $request, Screenshot $screenshot)
+{
+    try {
+        $validated = $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+        ]);
+
+        $user = Auth::user();
+
+        // Verificar si el usuario ya ha calificado
+        $existingRating = $screenshot->ratings()->where('user_id', $user->id)->first();
+        if ($existingRating) {
+            return response()->json(['message' => 'Ya has calificado esta captura'], 400);
+        }
+
+        // Guardar la calificación
+        $screenshot->ratings()->create([
+            'user_id' => $user->id,
+            'rating' => $validated['rating'],
+        ]);
+
+        // Calcular el promedio de calificaciones
+        $averageRating = $screenshot->ratings()->avg('rating');
+        $screenshot->average_rating = $averageRating;
+        $screenshot->save();
+
+        return response()->json([
+            'message' => 'Calificación registrada',
+            'average_rating' => round($averageRating, 1),
+            'user_rating' => $validated['rating'],
+        ], 200);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        Log::error('Validación fallida al calificar captura: ' . json_encode($e->errors()));
+        return response()->json(['message' => 'Validación fallida', 'errors' => $e->errors()], 422);
+    } catch (\Exception $e) {
+        Log::error('Error al calificar captura: ' . $e->getMessage());
+        return response()->json(['message' => 'Error al calificar captura'], 500);
+    }
+}
+
 
     public function getComments(Screenshot $screenshot)
     {

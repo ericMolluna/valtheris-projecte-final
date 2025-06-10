@@ -8,6 +8,26 @@ body {
   background: none;
 }
 
+.rating-section {
+  margin-top: 20px;
+}
+.rating-stars {
+  display: flex;
+  gap: 5px;
+  font-size: 24px;
+  cursor: pointer;
+}
+.star {
+  color: #ccc;
+}
+.star.filled {
+  color: #ff6f61;
+}
+.star:hover,
+.star:hover ~ .star {
+  color: #ff8f81;
+}
+
 /* Screenshot Details Container */
 .screenshot-details-container {
   background: url('@/assets/background-retro.png') no-repeat center center fixed;

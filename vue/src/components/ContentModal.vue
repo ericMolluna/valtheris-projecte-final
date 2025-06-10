@@ -34,8 +34,8 @@
             </div>
           </div>
           <div v-if="isAuthenticated" class="comment-form">
-            <textarea v-model="commentText" placeholder="Añade un comentario..." rows="2"></textarea>
-            <button @click="submitComment" class="submit-comment-btn">Comentar</button>
+            <textarea v-model="commentText" placeholder="Añade un comentario..." rows="2" maxlength="280"></textarea>
+            <button @click="submitComment" class="submit-comment-btn" :disabled="!commentText.trim()">Comentar</button>
           </div>
           <div class="comment-actions">
             <router-link :to="`/${type === 'screenshot' ? 'capturas' : 'videos'}/${item.id}`" class="view-details-btn">
@@ -61,24 +61,26 @@ export default {
     },
     item: Object,
     comments: Array,
-    modelValue: {
+    comment: { // Cambiado de modelValue a comment
       type: String,
       default: '',
     },
     isAuthenticated: Boolean,
   },
-  emits: ['update:modelValue', 'close', 'submit-comment', 'delete', 'video-error', 'toggle-like', 'toggle-dislike'],
+  emits: ['update:comment', 'close', 'submit-comment', 'delete', 'video-error', 'toggle-like', 'toggle-dislike'],
   data() {
     return {
-      commentText: this.modelValue,
+      commentText: this.comment, // Inicializar con prop comment
     };
   },
   watch: {
-    modelValue(newValue) {
+    comment(newValue) {
+      console.log('ContentModal: comment prop actualizado:', JSON.stringify(newValue));
       this.commentText = newValue;
     },
     commentText(newValue) {
-      this.$emit('update:modelValue', newValue);
+      console.log('ContentModal: commentText actualizado:', JSON.stringify(newValue));
+      this.$emit('update:comment', newValue);
     },
   },
   methods: {
@@ -86,6 +88,13 @@ export default {
       this.$emit('close');
     },
     submitComment() {
+      console.log('ContentModal: Clic en botón de enviar, commentText:', JSON.stringify(this.commentText));
+      const normalizedComment = this.commentText.trim();
+      if (!normalizedComment) {
+        console.log('ContentModal: Comentario vacío, no se emite submit-comment');
+        return;
+      }
+      this.$emit('update:comment', normalizedComment);
       this.$emit('submit-comment');
     },
     deleteItem() {

@@ -464,49 +464,51 @@ export default function CommunityViewLogic() {
   }
 
   async function submitComment() {
+    console.log('CommunityViewLogic: Evento submit-comment recibido, newComment:', JSON.stringify(state.newComment));
     if (!state.newComment.trim()) {
-      await Swal.fire({
-        title: 'Comentario vacío',
-        text: 'Por favor, escribe un comentario antes de enviar.',
-        icon: 'warning',
-        confirmButtonColor: '#ff6f61',
-      });
-      return;
+        console.log('CommunityViewLogic: Comentario vacío detectado:', JSON.stringify(state.newComment));
+        await Swal.fire({
+            title: 'Comentario vacío',
+            text: 'Por favor, escribe un comentario antes de enviar.',
+            icon: 'warning',
+            confirmButtonColor: '#ff6f61',
+        });
+        return;
     }
     try {
-      axios.defaults.baseURL = 'http://localhost:8000';
-      axios.defaults.withCredentials = true;
-      await axios.get('sanctum/csrf-cookie');
-      const token = localStorage.getItem('auth_token');
-      if (!token) {
-        throw new Error('No se encontró el token de autenticación.');
-      }
-      await axios.post(
-        `/api/screenshots/${state.selectedScreenshot.id}/comments`,
-        { text: state.newComment },
-        {
-          headers: { Authorization: `Bearer ${token}` },
+        axios.defaults.baseURL = 'http://localhost:8000';
+        axios.defaults.withCredentials = true;
+        console.log('CommunityViewLogic: Obteniendo CSRF cookie para submitComment...');
+        await axios.get('sanctum/csrf-cookie').then(() => {
+            console.log('CommunityViewLogic: CSRF cookie obtenido para submitComment');
+        });
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+            throw new Error('No se encontró el token de autenticación.');
         }
-      );
-      state.newComment = '';
-      await fetchComments(state.selectedScreenshot.id);
-      await Swal.fire({
-        title: '¡Comentario enviado!',
-        text: 'Tu comentario ha sido publicado exitosamente.',
-        icon: 'success',
-        timer: 2000,
-        showConfirmButton: false,
-      });
+        console.log('CommunityViewLogic: Enviando comentario:', state.newComment);
+       
+        state.newComment = '';
+        await fetchComments(state.selectedScreenshot.id);
+        await Swal.fire({
+            title: '¡Comentario enviado!',
+            text: 'Tu comentario ha sido publicado exitosamente.',
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false,
+        });
     } catch (error) {
-      state.errorMessageScreenshots = error.response?.data?.message || 'Error al enviar el comentario.';
-      await Swal.fire({
-        title: 'Error',
-        text: state.errorMessageScreenshots,
-        icon: 'error',
-        confirmButtonColor: '#ff6f61',
-      });
+        console.error('CommunityViewLogic: Error al enviar comentario:', error);
+        const errorMessage = error.response?.data?.message || error.message || 'Error al enviar el comentario.';
+        state.errorMessageScreenshots = errorMessage;
+        await Swal.fire({
+            title: 'Error',
+            text: errorMessage,
+            icon: 'error',
+            confirmButtonColor: '#ff6f61',
+        });
     }
-  }
+}
 
   async function toggleLike(screenshot) {
     if (!state.isAuthenticated) {

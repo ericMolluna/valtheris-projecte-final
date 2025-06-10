@@ -16,6 +16,7 @@ class Screenshot extends Model
         'description',
         'likes',
         'dislikes',
+        'average_rating', // Añadido para el sistema de rating
     ];
 
     public function user()
@@ -36,5 +37,10 @@ class Screenshot extends Model
     public function usersWhoDisliked()
     {
         return $this->belongsToMany(User::class, 'screenshot_dislikes', 'screenshot_id', 'user_id');
+    }
+
+    public function ratings()
+    {
+        return $this->hasMany(ScreenshotRating::class);
     }
 }

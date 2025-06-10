@@ -48,7 +48,8 @@
             <p>Explora capturas del juego compartidas por la comunidad.</p>
           </div>
           <div class="header-right">
-            <button :class="{ 'filter-btn': true, 'active': sortFilter === 'popular' }" @click="setSortFilter('popular')">
+            <button :class="{ 'filter-btn': true, 'active': sortFilter === 'popular' }"
+              @click="setSortFilter('popular')">
               Más Populares
             </button>
             <button :class="{ 'filter-btn': true, 'active': sortFilter === 'recent' }" @click="setSortFilter('recent')">
@@ -67,18 +68,16 @@
             <form @submit.prevent="uploadScreenshot">
               <div class="form-group">
                 <label for="screenshot-title">Título</label>
-                <input type="text" id="screenshot-title" v-model="newScreenshot.title" placeholder="Título de tu captura..." required maxlength="100" />
+                <input type="text" id="screenshot-title" v-model="newScreenshot.title"
+                  placeholder="Título de tu captura..." required maxlength="100" />
               </div>
               <div class="form-group">
-                <label for="screenshot-image">Seleccionar Imagen</label>
-                <input type="file" id="screenshot-image" accept="image/*" @change="handleFileChange" required ref="fileInput" />
+                <label for="screenshot-image">Seleccionar</label>
+                <input type="file" id="screenshot-image" accept="image/*" @change="handleFileChange" required
+                  ref="fileInput" />
                 <div v-if="imagePreview" class="image-preview">
                   <img :src="imagePreview" alt="Vista previa de la imagen" />
                 </div>
-              </div>
-              <div class="form-group">
-                <label for="screenshot-description">Descripción (Opcional)</label>
-                <textarea id="screenshot-description" v-model="newScreenshot.description" placeholder="Describe tu captura..." maxlength="500"></textarea>
               </div>
               <div class="form-actions">
                 <button type="submit" class="submit-btn" :disabled="isUploading">Subir</button>
@@ -104,17 +103,20 @@
           </div>
         </div>
         <div v-else class="screenshots-list" ref="screenshotsList">
-          <div class="screenshot-card" v-for="screenshot in screenshots" :key="screenshot.id" @click="openScreenshotModal(screenshot)">
+          <div class="screenshot-card" v-for="screenshot in screenshots" :key="screenshot.id"
+            @click="openScreenshotModal(screenshot)">
             <div class="screenshot-image">
               <img :src="screenshot.image_url" alt="Captura del juego" @error="handleImageError" />
             </div>
             <div class="screenshot-meta">
               <span>Subido por: {{ screenshot.user?.name || 'Anónimo' }}</span>
               <div class="quick-actions">
-                <button class="quick-action-btn" @click.stop="likeScreenshot(screenshot.id)" :disabled="!isAuthenticated || screenshot.user_liked || screenshot.user_disliked">
+                <button class="quick-action-btn" @click.stop="likeScreenshot(screenshot.id)"
+                  :disabled="!isAuthenticated || screenshot.user_liked || screenshot.user_disliked">
                   <span class="icon">👍</span> {{ screenshot.likes || 0 }}
                 </button>
-                <button class="quick-action-btn" @click.stop="dislikeScreenshot(screenshot.id)" :disabled="!isAuthenticated || screenshot.user_liked || screenshot.user_disliked">
+                <button class="quick-action-btn" @click.stop="dislikeScreenshot(screenshot.id)"
+                  :disabled="!isAuthenticated || screenshot.user_liked || screenshot.user_disliked">
                   <span class="icon">👎</span> {{ screenshot.dislikes || 0 }}
                 </button>
               </div>
@@ -138,14 +140,33 @@
           <div class="modal-meta">
             <span>Subido por: {{ selectedScreenshot.user?.name || 'Anónimo' }}</span>
             <div class="modal-actions">
-              <button class="action-btn" :disabled="!isAuthenticated || (selectedScreenshot.user_liked || selectedScreenshot.user_disliked)" @click="likeScreenshot(selectedScreenshot.id)">
+              <button class="action-btn"
+                :disabled="!isAuthenticated || (selectedScreenshot.user_liked || selectedScreenshot.user_disliked)"
+                @click="likeScreenshot(selectedScreenshot.id)">
                 <span class="icon">👍</span> Me Tonto ({{ selectedScreenshot.likes || 0 }})
               </button>
-              <button class="action-btn" :disabled="!isAuthenticated || (selectedScreenshot.user_liked || selectedScreenshot.user_disliked)" @click="dislikeScreenshot(selectedScreenshot.id)">
+              <button class="action-btn"
+                :disabled="!isAuthenticated || (selectedScreenshot.user_liked || selectedScreenshot.user_disliked)"
+                @click="dislikeScreenshot(selectedScreenshot.id)">
                 <span class="icon">👎</span> No me gusta ({{ selectedScreenshot.dislikes || 0 }})
               </button>
-              <button class="action-btn"><span class="icon">🏆</span> Premiar</button>
-              <button v-if="isAuthenticated && user && selectedScreenshot.user_id === user.id" @click="deleteScreenshot(selectedScreenshot.id)" class="delete-btn">
+              <div class="rating-section">
+                <span
+                  v-for="star in 5"
+                  :key="star"
+                  class="star"
+                  :class="{ filled: star <= selectedScreenshot.user_rating || (selectedScreenshot.average_rating && star <= Math.round(selectedScreenshot.average_rating)) }"
+                  @click="isAuthenticated && rateScreenshot(selectedScreenshot.id, star)"
+                >
+                  ★
+                </span>
+                <span v-if="selectedScreenshot.average_rating">
+                  ({{ selectedScreenshot.average_rating.toFixed(1) }}/5)
+                </span>
+                <span v-else>Sin calificaciones</span>
+              </div>
+              <button v-if="isAuthenticated && user && selectedScreenshot.user_id === user.id"
+                @click="deleteScreenshot(selectedScreenshot.id)" class="delete-btn">
                 <span class="icon">🗑️</span> Eliminar
               </button>
             </div>
@@ -162,13 +183,15 @@
               <div v-for="comment in comments" :key="comment.id" class="comment">
                 <span class="comment-user">{{ comment.user?.name || 'Anónimo' }}:</span>
                 <p class="comment-text">{{ comment.text }}</p>
-                <button v-if="isAuthenticated && user && comment.user_id === user.id" @click="deleteComment(comment.id)" class="delete-comment-btn">
+                <button v-if="isAuthenticated && user && comment.user_id === user.id" @click="deleteComment(comment.id)"
+                  class="delete-comment-btn">
                   <span class="icon">🗑️</span> Eliminar
                 </button>
               </div>
             </div>
             <div v-if="isAuthenticated" class="comment-form">
-              <textarea v-model="newComment" placeholder="Añade un comentario..." rows="2" maxlength="280" aria-label="Escribe un comentario"></textarea>
+              <textarea v-model="newComment" @input="logComment" placeholder="Añade un comentario..." rows="2"
+                maxlength="280" aria-label="Escribe un comentario"></textarea>
               <div class="comment-counter" :class="{ 'warning': newComment.length > 260 }">
                 {{ newComment.length }}/280
               </div>
@@ -185,7 +208,7 @@
     <!-- Footer -->
     <footer class="footer-section">
       <div class="footer-content">
-        <p>&copy; 2025 Valtheris. Todos los derechos reservados.</p>
+        <p>© 2025 Valtheris. Todos los derechos reservados.</p>
         <div class="social-links">
           <a href="#" class="social-icon" aria-label="Twitter">🐦</a>
           <a href="#" class="social-icon" aria-label="Discord">💬</a>
@@ -319,6 +342,8 @@ export default {
           dislikes: screenshot.dislikes || 0,
           user_liked: screenshot.user_liked || false,
           user_disliked: screenshot.user_disliked || false,
+          average_rating: screenshot.average_rating || null,
+          user_rating: screenshot.user_rating || null,
         }));
         this.screenshots = append ? [...this.screenshots, ...newScreenshots] : newScreenshots;
         this.hasMore = response.data.current_page < response.data.last_page;
@@ -367,90 +392,90 @@ export default {
         this.imagePreview = null;
       }
     },
-  async uploadScreenshot() {
-  if (!this.newScreenshot.image) {
-    this.uploadError = 'Por favor, selecciona una imagen válida.';
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: this.uploadError,
-      confirmButtonColor: '#ff0066',
-    });
-    return;
-  }
-  if (!this.newScreenshot.title.trim()) {
-    this.uploadError = 'Por favor, proporciona un título.';
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: this.uploadError,
-      confirmButtonColor: '#ff0066',
-    });
-    return;
-  }
-  const maxSize = 2048 * 1024;
-  if (this.newScreenshot.image.size > maxSize) {
-    this.uploadError = 'La imagen excede el tamaño máximo de 2MB.';
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: this.uploadError,
-      confirmButtonColor: '#ff0066',
-    });
-    return;
-  }
-  if (!this.newScreenshot.image.type.startsWith('image/')) {
-    this.uploadError = 'El archivo seleccionado no es una imagen válida.';
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: this.uploadError,
-      confirmButtonColor: '#ff0066',
-    });
-    return;
-  }
+    async uploadScreenshot() {
+      if (!this.newScreenshot.image) {
+        this.uploadError = 'Por favor, selecciona una imagen válida.';
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: this.uploadError,
+          confirmButtonColor: '#ff0066',
+        });
+        return;
+      }
+      if (!this.newScreenshot.title.trim()) {
+        this.uploadError = 'Por favor, proporciona un título.';
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: this.uploadError,
+          confirmButtonColor: '#ff0066',
+        });
+        return;
+      }
+      const maxSize = 2048 * 1024;
+      if (this.newScreenshot.image.size > maxSize) {
+        this.uploadError = 'La imagen excede el tamaño máximo de 2MB.';
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: this.uploadError,
+          confirmButtonColor: '#ff0066',
+        });
+        return;
+      }
+      if (!this.newScreenshot.image.type.startsWith('image/')) {
+        this.uploadError = 'El archivo seleccionado no es una imagen válida.';
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: this.uploadError,
+          confirmButtonColor: '#ff0066',
+        });
+        return;
+      }
 
-  const formData = new FormData();
-  formData.append('title', this.newScreenshot.title);
-  formData.append('image', this.newScreenshot.image);
-  formData.append('description', this.newScreenshot.description || '');
+      const formData = new FormData();
+      formData.append('title', this.newScreenshot.title);
+      formData.append('image', this.newScreenshot.image);
+      formData.append('description', this.newScreenshot.description || '');
 
-  try {
-    this.isUploading = true;
-    axios.defaults.baseURL = 'http://localhost:8000';
-    axios.defaults.withCredentials = true;
-    await axios.get('sanctum/csrf-cookie');
-    const token = localStorage.getItem('auth_token');
-    if (!token) throw new Error('No se encontró el token de autenticación.');
-    await axios.post('/api/screenshots', formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    this.closeUploadForm();
-    await this.fetchScreenshots();
-    Swal.fire({
-      icon: 'success',
-      title: '¡Captura subida!',
-      text: 'Tu captura ha sido subida exitosamente.',
-      timer: 2000,
-      showConfirmButton: false,
-    });
-  } catch (error) {
-    this.uploadError = error.response
-      ? error.response.data.message || `Error ${error.response.status}`
-      : error.message;
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: this.uploadError,
-      confirmButtonColor: '#ff0066',
-    });
-  } finally {
-    this.isUploading = false;
-  }
-},
+      try {
+        this.isUploading = true;
+        axios.defaults.baseURL = 'http://localhost:8000';
+        axios.defaults.withCredentials = true;
+        await axios.get('sanctum/csrf-cookie');
+        const token = localStorage.getItem('auth_token');
+        if (!token) throw new Error('No se encontró el token de autenticación.');
+        await axios.post('/api/screenshots', formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        this.closeUploadForm();
+        await this.fetchScreenshots();
+        Swal.fire({
+          icon: 'success',
+          title: '¡Captura subida!',
+          text: 'Tu captura ha sido subida exitosamente.',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } catch (error) {
+        this.uploadError = error.response
+          ? error.response.data.message || `Error ${error.response.status}`
+          : error.message;
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: this.uploadError,
+          confirmButtonColor: '#ff0066',
+        });
+      } finally {
+        this.isUploading = false;
+      }
+    },
     async deleteScreenshot(screenshotId) {
       const result = await Swal.fire({
         title: '¿Estás seguro?',
@@ -592,6 +617,52 @@ export default {
         });
       }
     },
+    async rateScreenshot(screenshotId, rating) {
+      if (!this.isAuthenticated) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Inicia sesión',
+          text: 'Debes iniciar sesión para calificar.',
+          confirmButtonColor: '#ff0066',
+        });
+        return;
+      }
+
+      try {
+        axios.defaults.baseURL = 'http://localhost:8000';
+        axios.defaults.withCredentials = true;
+        await axios.get('sanctum/csrf-cookie');
+        const token = localStorage.getItem('auth_token');
+        if (!token) throw new Error('No se encontró el token de autenticación.');
+        const response = await axios.post(
+          `/api/screenshots/${screenshotId}/rate`,
+          { rating },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        this.screenshots = this.screenshots.map(s =>
+          s.id === screenshotId ? { ...s, average_rating: response.data.average_rating, user_rating: response.data.user_rating } : s
+        );
+        if (this.selectedScreenshot && this.selectedScreenshot.id === screenshotId) {
+          this.selectedScreenshot = { ...this.selectedScreenshot, average_rating: response.data.average_rating, user_rating: response.data.user_rating };
+        }
+        Swal.fire({
+          icon: 'success',
+          title: '¡Calificación enviada!',
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      } catch (error) {
+        const errorMsg = error.response
+          ? `Error ${error.response.status}: ${error.response.data.message || error.response.statusText}`
+          : error.message;
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: `No se pudo enviar la calificación: ${errorMsg}`,
+          confirmButtonColor: '#ff0066',
+        });
+      }
+    },
     async deleteComment(commentId) {
       const result = await Swal.fire({
         title: '¿Estás seguro?',
@@ -635,6 +706,7 @@ export default {
     },
     openScreenshotModal(screenshot) {
       this.selectedScreenshot = { ...screenshot };
+      this.newComment = '';
       this.fetchComments(screenshot.id);
     },
     closeScreenshotModal() {
@@ -649,8 +721,10 @@ export default {
         axios.defaults.withCredentials = true;
         await axios.get('sanctum/csrf-cookie');
         const response = await axios.get(`/api/screenshots/${screenshotId}/comments`);
-        this.comments = response.data;
+        console.log('Respuesta de comentarios:', response.data);
+        this.comments = [...response.data];
       } catch (error) {
+        console.error('Error al cargar comentarios:', error);
         Swal.fire({
           icon: 'error',
           title: 'Error',
@@ -662,7 +736,10 @@ export default {
       }
     },
     async submitComment() {
-      if (!this.newComment.trim()) {
+      this.newComment = this.newComment.trim().replace(/\s+/g, ' ');
+      console.log('Valor normalizado de newComment:', JSON.stringify(this.newComment), 'Longitud:', this.newComment.length);
+
+      if (!this.newComment) {
         Swal.fire({
           icon: 'warning',
           title: 'Comentario vacío',
@@ -677,14 +754,18 @@ export default {
         axios.defaults.withCredentials = true;
         await axios.get('sanctum/csrf-cookie');
         const token = localStorage.getItem('auth_token');
-        if (!token) throw new Error('No se encontró el token de autenticación.');
-        await axios.post(
+        if (!token) {
+          throw new Error('No se encontró el token de autenticación.');
+        }
+        console.log('Enviando comentario:', this.newComment);
+        const response = await axios.post(
           `/api/screenshots/${this.selectedScreenshot.id}/comments`,
           { text: this.newComment },
           { headers: { Authorization: `Bearer ${token}` } }
         );
+        console.log('Respuesta del POST:', response.data);
         this.newComment = '';
-        await this.fetchComments(this.selectedScreenshot.id);
+        setTimeout(() => this.fetchComments(this.selectedScreenshot.id), 500);
         Swal.fire({
           icon: 'success',
           title: '¡Comentario enviado!',
@@ -692,6 +773,7 @@ export default {
           showConfirmButton: false,
         });
       } catch (error) {
+        console.error('Error al enviar comentario:', error);
         const errorMsg = error.response
           ? `Error ${error.response.status}: ${error.response.data.message || error.response.statusText}`
           : error.message;
@@ -733,6 +815,9 @@ export default {
           confirmButtonColor: '#ff0066',
         });
       }
+    },
+    logComment() {
+      console.log('Comentario actual:', this.newComment);
     },
   },
 };

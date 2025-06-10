@@ -60,18 +60,18 @@
 
     <!-- Modals -->
     <ContentModal
-      v-if="selectedScreenshot"
-      type="screenshot"
-      :item="selectedScreenshot"
-      :comments="comments"
-      :isAuthenticated="isAuthenticated"
-      v-model:comment="newComment"
-      @close="closeScreenshotModal"
-      @submit-comment="submitComment"
-      @delete="deleteScreenshot"
-      @toggle-like="toggleLike"
-      @toggle-dislike="toggleDislike"
-    />
+  v-if="selectedScreenshot"
+  type="screenshot"
+  :item="selectedScreenshot"
+  :comments="comments"
+  :isAuthenticated="isAuthenticated"
+  v-model:comment="newComment"
+  @close="closeScreenshotModal"
+  @submit-comment="submitComment"
+  @delete="deleteScreenshot"
+  @toggle-like="toggleLike"
+  @toggle-dislike="toggleDislike"
+/>
     <ContentModal
       v-if="selectedVideo"
       type="video"

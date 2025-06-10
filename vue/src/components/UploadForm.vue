@@ -9,9 +9,13 @@
         </div>
         <div class="form-group">
           <label :for="`${type}-file`">Seleccionar {{ type === 'screenshot' ? 'Imagen' : 'Video' }}</label>
-          <input type="file" :id="`${type}-file`" :accept="type === 'screenshot' ? 'image/*' : 'video/*'" @change="handleFileChange" required />
+          <input type="file" :id="`${type}-file`" :accept="type === 'screenshot' ? 'image/*' : 'video/mp4,video/mov,video/avi'" @change="handleFileChange" required />
         </div>
-        <div v-if="type === 'video' || type === 'screenshot'" class="form-group">
+        <div class="form-group" v-if="type === 'video'">
+          <label for="video-thumbnail">Portada del Video (Obligatoria)</label>
+          <input type="file" id="video-thumbnail" accept="image/jpeg,image/png,image/jpg" @change="handleThumbnailChange" required />
+        </div>
+        <div class="form-group">
           <label :for="`${type}-description`">Descripción (Opcional)</label>
           <textarea :id="`${type}-description`" v-model="item.description" :placeholder="`Describe tu ${type}...`"></textarea>
         </div>
@@ -52,10 +56,20 @@ export default {
   methods: {
     handleFileChange(event) {
       const file = event.target.files[0];
-      if (this.type === 'screenshot') this.item.image = file;
-      else this.item.video = file;
+      if (this.type === 'screenshot') {
+        this.item.image = file;
+      } else {
+        this.item.video = file;
+      }
+    },
+    handleThumbnailChange(event) {
+      this.item.thumbnail = event.target.files[0];
     },
     handleSubmit() {
+      if (this.type === 'video' && !this.item.thumbnail) {
+        this.$emit('update:error', 'Debes seleccionar una portada');
+        return;
+      }
       this.$emit('upload');
     },
   },
@@ -63,10 +77,6 @@ export default {
 </script>
 
 <style scoped>
-
-.h3 {
-  color: white;
-}
 .upload-form-modal {
   position: fixed;
   top: 0;
@@ -108,6 +118,10 @@ input, textarea {
   border-radius: 4px;
 }
 
+textarea {
+  resize: vertical;
+}
+
 .form-actions {
   display: flex;
   gap: 10px;
@@ -136,6 +150,7 @@ input, textarea {
   text-align: center;
   margin-top: 10px;
 }
+
 h3 {
   color: #00ffcc;
   font-weight: 700;
@@ -144,4 +159,4 @@ h3 {
   text-transform: uppercase;
   letter-spacing: 1.5px;
 }
-</style>  
+</style>

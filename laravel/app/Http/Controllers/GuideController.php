@@ -20,11 +20,25 @@ class GuideController extends Controller
 
     // Nuevo método para obtener todas las guías (públicas)
     public function all()
-    {
-        $guides = Guide::with('user')->get(); // Incluye el usuario que creó la guía
-        return response()->json($guides);
-    }
-
+{
+    $guides = Guide::with('user')->get();
+    return response()->json($guides->map(function ($guide) {
+        return [
+            'id' => $guide->id,
+            'user_id' => $guide->user_id,
+            'title' => $guide->title,
+            'description' => $guide->description,
+            'content' => $guide->content,
+            'category' => $guide->category,
+            'image_url' => $guide->image ? Storage::url($guide->image) : null,
+            'createdBy' => $guide->user ? $guide->user->name : 'Anónimo',
+            'likes' => $guide->likes ?? 0,
+            'dislikes' => $guide->dislikes ?? 0,
+            'created_at' => $guide->created_at,
+            'updated_at' => $guide->updated_at,
+        ];
+    }));
+}
     public function store(Request $request)
 {
     $request->validate([
@@ -176,14 +190,14 @@ class GuideController extends Controller
 {
     $guide = Guide::with(['user', 'usersWhoLiked', 'usersWhoDisliked'])->findOrFail($id);
     $user = Auth::user();
-
+    $baseUrl = config('app.url');
     return response()->json([
         'id' => $guide->id,
         'title' => $guide->title,
         'description' => $guide->description,
         'content' => $guide->content,
         'category' => $guide->category,
-        'image_url' => $guide->image ? Storage::url($guide->image) : null,
+        'image_url' => $guide->image ? $baseUrl . Storage::url($guide->image) : null,
         'user_id' => $guide->user_id,
         'createdBy' => $guide->user ? $guide->user->name : 'Anónimo',
         'user' => $guide->user,
@@ -195,6 +209,8 @@ class GuideController extends Controller
         'updated_at' => $guide->updated_at,
     ]);
 }
+
+
     public function ratings($id)
     {
         $guide = Guide::with('ratings.user')->findOrFail($id);

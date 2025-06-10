@@ -29,7 +29,7 @@ class VideoController extends Controller
                 'title' => 'required|string|max:255',
                 'video' => 'required|file|mimes:mp4,mov,avi|max:10240',
                 'description' => 'nullable|string',
-                'thumbnail' => 'nullable|file|mimes:jpeg,png,jpg|max:2048', // Thumbnail validation
+                'thumbnail' => 'nullable|file|mimes:jpeg,png,jpg|max:2048',
             ]);
 
             if (!auth()->check()) {
